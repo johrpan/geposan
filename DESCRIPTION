@@ -1,0 +1,30 @@
+Package: geposan
+Title: Gene Position Analysis
+Version: 0.0.0.9000
+Authors@R:
+    person(
+        "Elias",
+        "Projahn",
+        email = "elias@johrpan.de",
+        role = c("aut", "cre"),
+    )
+Description: Analyze genes based on their position across species. This package
+    includes gene data from Ensembl. It provides multiple methods to use that
+    data to find genes that score well in comparison with a set of reference
+    genes.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+LazyDataCompression: xz
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Depends:
+    R (>= 2.10)
+Imports:
+    data.table,
+    neuralnet
+Suggests:
+    biomaRt,
+    rlog,
+    stringr,
+    usethis
