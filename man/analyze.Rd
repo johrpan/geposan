@@ -4,10 +4,14 @@
 \alias{analyze}
 \title{Analyze by applying the specified preset.}
 \usage{
-analyze(preset)
+analyze(preset, progress = NULL)
 }
 \arguments{
 \item{preset}{The preset to use which can be created using \code{\link[=preset]{preset()}}.}
+
+\item{progress}{A function to be called for progress information. The
+function should accept a number between 0.0 and 1.0 for the current
+progress.}
 }
 \value{
 A \link{data.table} with one row for each gene identified by it's ID

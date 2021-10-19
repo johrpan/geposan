@@ -31,18 +31,23 @@ preset <- function(methods, species, genes, reference_genes) {
 #' Analyze by applying the specified preset.
 #'
 #' @param preset The preset to use which can be created using [preset()].
+#' @param progress A function to be called for progress information. The
+#'   function should accept a number between 0.0 and 1.0 for the current
+#'   progress.
 #'
 #' @return A [data.table] with one row for each gene identified by it's ID
 #'   (`gene` column). The additional columns contain the resulting scores per
 #'   method and are named after the method IDs.
 #'
 #' @export
-analyze <- function(preset) {
+analyze <- function(preset, progress = NULL) {
     # Available methods by ID.
     #
     # A method describes a way to perform a computation on gene distance data
     # that results in a single score per gene. The function should accept the
-    # preset to apply as a single parameter (see [preset()]).
+    # distances data, the preset to apply (see [preset()]) and an optional
+    # progress function (that may be called with a number between 0.0 and 1.0)
+    # as its parameters.
     #
     # The function should return a [data.table] with the following columns:
     #
@@ -55,10 +60,21 @@ analyze <- function(preset) {
         "neural" = neural
     )
 
+    total_progress <- 0.0
+    method_count <- length(preset$method_ids)
     results <- data.table(gene = genes$id)
 
     for (method_id in preset$method_ids) {
-        method_results <- methods[[method_id]](distances, preset)
+        method_progress <- if (!is.null(progress)) function(p) {
+            progress(total_progress + p / method_count)
+        }
+
+        method_results <- methods[[method_id]](
+            distances,
+            preset,
+            method_progress
+        )
+
         setnames(method_results, "score", method_id)
 
         results <- merge(
@@ -66,6 +82,12 @@ analyze <- function(preset) {
             method_results,
             by = "gene"
         )
+
+        total_progress <- total_progress + 1 / method_count
+    }
+
+    if (!is.null(progress)) {
+        progress(1.0)
     }
 
     results

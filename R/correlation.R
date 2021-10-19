@@ -1,6 +1,6 @@
 # Compute the mean correlation coefficient comparing gene distances with a set
 # of reference genes.
-correlation <- function(distances, preset) {
+correlation <- function(distances, preset, progress = NULL) {
     results <- data.table(gene = preset$gene_ids)
     reference_gene_ids <- preset$reference_gene_ids
     reference_count <- length(reference_gene_ids)
@@ -13,6 +13,9 @@ correlation <- function(distances, preset) {
 
     # Prepare the reference genes' data.
     reference_distances <- distances[gene %chin% reference_gene_ids]
+
+    genes_done <- 0
+    genes_total <- length(preset$gene_ids)
 
     # Perform the correlation for one gene.
     compute <- function(gene_id) {
@@ -29,7 +32,7 @@ correlation <- function(distances, preset) {
 
         # Correlate with all reference genes but not with the gene itself.
         for (reference_gene_id in
-             reference_gene_ids[reference_gene_ids != gene_id]) {
+            reference_gene_ids[reference_gene_ids != gene_id]) {
             data <- merge(
                 gene_distances,
                 reference_distances[reference_gene_id],
@@ -55,6 +58,13 @@ correlation <- function(distances, preset) {
 
         # Compute the score as the mean correlation coefficient.
         score <- correlation_sum / reference_count
+
+        if (!is.null(progress)) {
+            genes_done <<- genes_done + 1
+            progress(genes_done / genes_total)
+        }
+
+        score
     }
 
     results[, score := compute(gene), by = 1:nrow(results)]

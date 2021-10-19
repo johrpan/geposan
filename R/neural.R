@@ -1,7 +1,7 @@
 # Find genes by training a neural network on reference position data.
 #
 # @param seed A seed to get reproducible results.
-neural <- function(distances, preset, seed = 448077) {
+neural <- function(distances, preset, progress = NULL, seed = 448077) {
     species_ids <- preset$species_ids
     reference_gene_ids <- preset$reference_gene_ids
 
@@ -89,8 +89,20 @@ neural <- function(distances, preset, seed = 448077) {
         linear.output = FALSE
     )
 
-    # Return the resulting scores given by applying the neural network.
+    if (!is.null(progress)) {
+        # We do everything in one go, so it's not possible to report detailed
+        # progress information. As the method is relatively quick, this should
+        # not be a problem.
+        progress(0.5)
+    }
 
+    # Apply the neural network.
     data[, score := neuralnet::compute(nn, data)$net.result]
+
+    if (!is.null(progress)) {
+        # See above.
+        progress(1.0)
+    }
+
     data[, .(gene, score)]
 }
