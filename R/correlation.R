@@ -31,8 +31,11 @@ correlation <- function(distances, preset, progress = NULL) {
         correlation_sum <- 0
 
         # Correlate with all reference genes but not with the gene itself.
-        for (reference_gene_id in
-            reference_gene_ids[reference_gene_ids != gene_id]) {
+        gene_reference_gene_ids <- reference_gene_ids[
+            reference_gene_ids != gene_id
+        ]
+
+        for (reference_gene_id in gene_reference_gene_ids) {
             data <- merge(
                 gene_distances,
                 reference_distances[reference_gene_id],
@@ -50,14 +53,19 @@ correlation <- function(distances, preset, progress = NULL) {
             # relation.
             setorder(data, distance.y)
 
-            correlation_sum <- correlation_sum + abs(stats::cor(
+            correlation <- abs(stats::cor(
                 data[, distance.x], data[, distance.y],
                 method = "spearman"
             ))
+
+            # If the correlation is NA, this will effectively mean 0.0.
+            if (!is.na(correlation)) {
+                correlation_sum <- correlation_sum + correlation
+            }
         }
 
         # Compute the score as the mean correlation coefficient.
-        score <- correlation_sum / reference_count
+        score <- correlation_sum / length(gene_reference_gene_ids)
 
         if (!is.null(progress)) {
             genes_done <<- genes_done + 1
