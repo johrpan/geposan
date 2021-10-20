@@ -1,79 +1,73 @@
 # Compute the mean correlation coefficient comparing gene distances with a set
 # of reference genes.
 correlation <- function(distances, preset, progress = NULL) {
-    results <- data.table(gene = preset$gene_ids)
+    species_ids <- preset$species_ids
+    gene_ids <- preset$gene_ids
     reference_gene_ids <- preset$reference_gene_ids
-    reference_count <- length(reference_gene_ids)
 
     # Prefilter distances by species.
-    distances <- distances[species %chin% preset$species_ids]
+    distances <- distances[species %chin% species_ids]
 
-    # Add an index for quickly accessing data per gene.
-    setkey(distances, gene)
+    # Tranform data to get species as rows and genes as columns. We construct
+    # columns per species, because it requires fewer iterations, and transpose
+    # the table afterwards.
 
-    # Prepare the reference genes' data.
-    reference_distances <- distances[gene %chin% reference_gene_ids]
+    data <- data.table(gene = gene_ids)
 
-    genes_done <- 0
-    genes_total <- length(preset$gene_ids)
+    # Make a column containing distance data for each species.
+    for (species_id in species_ids) {
+        species_distances <- distances[species == species_id, .(gene, distance)]
+        data <- merge(data, species_distances, all.x = TRUE)
+        setnames(data, "distance", species_id)
+    }
 
-    # Perform the correlation for one gene.
-    compute <- function(gene_id) {
-        gene_distances <- distances[gene_id]
-        gene_species_count <- nrow(gene_distances)
+    # Transpose to the desired format.
+    data <- transpose(data, make.names = "gene")
 
-        # Return a score of 0.0 if there is just one or no value at all.
-        if (gene_species_count <= 1) {
-            return(0.0)
-        }
+    if (!is.null(progress)) progress(0.33)
 
-        # Buffer for the sum of correlation coefficients.
-        correlation_sum <- 0
+    # Take the reference data.
+    reference_data <- data[, ..reference_gene_ids]
 
-        # Correlate with all reference genes but not with the gene itself.
-        gene_reference_gene_ids <- reference_gene_ids[
-            reference_gene_ids != gene_id
-        ]
+    # Perform the correlation between all possible pairs.
+    results <- stats::cor(
+        data[, ..gene_ids],
+        reference_data,
+        use = "pairwise.complete.obs",
+        method = "spearman"
+    )
 
-        for (reference_gene_id in gene_reference_gene_ids) {
-            data <- merge(
-                gene_distances,
-                reference_distances[reference_gene_id],
-                by = "species"
-            )
+    results <- data.table(results, keep.rownames = TRUE)
+    setnames(results, "rn", "gene")
 
-            # Skip this reference gene, if there are not enough value pairs.
-            # This will lessen the final score, because it effectively
-            # represents a correlation coefficient of 0.0.
-            if (nrow(data) <= 1) {
-                next
-            }
+    # Remove correlations between the reference genes themselves.
+    for (reference_gene_id in reference_gene_ids) {
+        column <- quote(reference_gene_id)
+        results[gene == reference_gene_id, eval(column) := NA]
+    }
 
-            # Order data by the reference gene's distance to get a monotonic
-            # relation.
-            setorder(data, distance.y)
+    if (!is.null(progress)) progress(0.66)
 
-            correlation <- abs(stats::cor(
-                data[, distance.x], data[, distance.y],
-                method = "spearman"
-            ))
+    # Compute the final score as the mean of known correlation scores. Negative
+    # correlations will correctly lessen the score, which will be clamped to
+    # zero as its lower bound. Genes with no possible correlations at all will
+    # be assumed to have a score of 0.0.
 
-            # If the correlation is NA, this will effectively mean 0.0.
-            if (!is.na(correlation)) {
-                correlation_sum <- correlation_sum + correlation
-            }
-        }
+    compute_score <- function(scores) {
+        score <- mean(scores, na.rm = TRUE)
 
-        # Compute the score as the mean correlation coefficient.
-        score <- correlation_sum / length(gene_reference_gene_ids)
-
-        if (!is.null(progress)) {
-            genes_done <<- genes_done + 1
-            progress(genes_done / genes_total)
+        if (is.na(score) | score < 0.0) {
+            score <- 0.0
         }
 
         score
     }
 
-    results[, score := compute(gene), by = 1:nrow(results)]
+    results[,
+        score := compute_score(as.matrix(.SD)),
+        .SDcols = reference_gene_ids,
+        by = gene
+    ]
+
+    results[, .(gene, score)]
 }
