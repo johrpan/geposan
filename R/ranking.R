@@ -67,6 +67,7 @@ optimize_weights <- function(results, methods, reference_gene_ids,
     }
 
     factors <- stats::optim(rep(1.0, length(methods)), target_rank)$par
+    factors[factors < 0.0] <- 0.0
     total_weight <- sum(factors)
 
     weights(factors / total_weight)
