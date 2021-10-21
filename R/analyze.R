@@ -45,9 +45,8 @@ analyze <- function(preset, progress = NULL) {
     #
     # A method describes a way to perform a computation on gene distance data
     # that results in a single score per gene. The function should accept the
-    # distances data, the preset to apply (see [preset()]) and an optional
-    # progress function (that may be called with a number between 0.0 and 1.0)
-    # as its parameters.
+    # preset to apply (see [preset()]) and an optional progress function (that
+    # may be called with a number between 0.0 and 1.0) as its parameters.
     #
     # The function should return a [data.table] with the following columns:
     #
@@ -62,19 +61,14 @@ analyze <- function(preset, progress = NULL) {
 
     total_progress <- 0.0
     method_count <- length(preset$method_ids)
-    results <- data.table(gene = genes$id)
+    results <- data.table(gene = preset$gene_ids)
 
     for (method_id in preset$method_ids) {
         method_progress <- if (!is.null(progress)) function(p) {
             progress(total_progress + p / method_count)
         }
 
-        method_results <- methods[[method_id]](
-            distances,
-            preset,
-            method_progress
-        )
-
+        method_results <- methods[[method_id]](preset, method_progress)
         setnames(method_results, "score", method_id)
 
         results <- merge(

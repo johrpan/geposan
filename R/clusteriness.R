@@ -36,11 +36,11 @@ clusteriness_priv <- function(data, height = 1000000) {
 }
 
 # Process genes clustering their distance to telomeres.
-clusteriness <- function(distances, preset, progress = NULL) {
+clusteriness <- function(preset, progress = NULL) {
     results <- data.table(gene = preset$gene_ids)
 
     # Prefilter the input data by species.
-    distances <- distances[species %chin% preset$species_ids]
+    distances <- geposan::distances[species %chin% preset$species_ids]
 
     # Add an index for quickly accessing data per gene.
     setkey(distances, gene)

@@ -1,7 +1,7 @@
 # Find genes by training a neural network on reference position data.
 #
 # @param seed A seed to get reproducible results.
-neural <- function(distances, preset, progress = NULL, seed = 448077) {
+neural <- function(preset, progress = NULL, seed = 448077) {
     species_ids <- preset$species_ids
     reference_gene_ids <- preset$reference_gene_ids
 
@@ -9,7 +9,7 @@ neural <- function(distances, preset, progress = NULL, seed = 448077) {
     gene_count <- length(preset$gene_ids)
 
     # Prefilter distances by species.
-    distances <- distances[species %chin% species_ids]
+    distances <- geposan::distances[species %chin% species_ids]
 
     # Input data for the network. This contains the gene ID as an identifier
     # as well as the per-species gene distances as input variables.
