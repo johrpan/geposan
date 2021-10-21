@@ -142,11 +142,6 @@ for (species_id in species[!id == "hsapiens", id]) {
     distances <- rbindlist(list(distances, species_distances))
 }
 
-# Add information on number of species per gene.
-
-genes_n_species <- distances[, .(n_species = .N), by = "gene"]
-genes <- merge(genes, genes_n_species, by.x = "id", by.y = "gene")
-
 # Save data in the appropriate place.
 
 usethis::use_data(species, overwrite = TRUE)

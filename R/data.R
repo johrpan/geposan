@@ -17,7 +17,6 @@
 #'   \item{id}{Ensembl gene ID}
 #'   \item{name}{The gene's HGNC name}
 #'   \item{chrosome}{The human chromosome the gene is located on}
-#'   \item{n_species}{Number of known species with the gene.}
 #' }
 "genes"
 
