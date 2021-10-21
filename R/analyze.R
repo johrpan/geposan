@@ -21,10 +21,10 @@
 #' @export
 preset <- function(methods, species, genes, reference_genes) {
     list(
-        method_ids = methods,
-        species_ids = species,
-        gene_ids = genes,
-        reference_gene_ids = reference_genes
+        method_ids = sort(methods),
+        species_ids = sort(species),
+        gene_ids = sort(genes),
+        reference_gene_ids = sort(reference_genes)
     )
 }
 
