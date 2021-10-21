@@ -59,30 +59,32 @@ analyze <- function(preset, progress = NULL) {
         "neural" = neural
     )
 
-    total_progress <- 0.0
-    method_count <- length(preset$method_ids)
-    results <- data.table(gene = preset$gene_ids)
+    cached("results", preset, {
+        total_progress <- 0.0
+        method_count <- length(preset$method_ids)
+        results <- data.table(gene = preset$gene_ids)
 
-    for (method_id in preset$method_ids) {
-        method_progress <- if (!is.null(progress)) function(p) {
-            progress(total_progress + p / method_count)
+        for (method_id in preset$method_ids) {
+            method_progress <- if (!is.null(progress)) function(p) {
+                progress(total_progress + p / method_count)
+            }
+
+            method_results <- methods[[method_id]](preset, method_progress)
+            setnames(method_results, "score", method_id)
+
+            results <- merge(
+                results,
+                method_results,
+                by = "gene"
+            )
+
+            total_progress <- total_progress + 1 / method_count
         }
 
-        method_results <- methods[[method_id]](preset, method_progress)
-        setnames(method_results, "score", method_id)
+        if (!is.null(progress)) {
+            progress(1.0)
+        }
 
-        results <- merge(
-            results,
-            method_results,
-            by = "gene"
-        )
-
-        total_progress <- total_progress + 1 / method_count
-    }
-
-    if (!is.null(progress)) {
-        progress(1.0)
-    }
-
-    results
+        results
+    })
 }

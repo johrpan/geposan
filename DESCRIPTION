@@ -22,7 +22,8 @@ Depends:
     R (>= 2.10)
 Imports:
     data.table,
-    neuralnet
+    neuralnet,
+    rlang
 Suggests:
     biomaRt,
     rlog,
