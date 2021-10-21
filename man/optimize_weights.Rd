@@ -4,7 +4,7 @@
 \alias{optimize_weights}
 \title{Find the best weights to rank the results.}
 \usage{
-optimize_weights(results, methods, reference_gene_ids)
+optimize_weights(results, methods, reference_gene_ids, target = "mean")
 }
 \arguments{
 \item{results}{Results from \code{\link[=analyze]{analyze()}} or \code{\link[=ranking]{ranking()}}.}
@@ -12,6 +12,9 @@ optimize_weights(results, methods, reference_gene_ids)
 \item{methods}{Methods to include in the score.}
 
 \item{reference_gene_ids}{IDs of the reference genes.}
+
+\item{target}{The optimization target. It may be one of "mean", "min" or
+"max" and results in the respective rank being optimized.}
 }
 \value{
 Named list pairing method names with their optimal weights.

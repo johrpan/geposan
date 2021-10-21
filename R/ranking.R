@@ -34,11 +34,14 @@ ranking <- function(results, weights) {
 #' @param results Results from [analyze()] or [ranking()].
 #' @param methods Methods to include in the score.
 #' @param reference_gene_ids IDs of the reference genes.
+#' @param target The optimization target. It may be one of "mean", "min" or
+#'   "max" and results in the respective rank being optimized.
 #'
 #' @returns Named list pairing method names with their optimal weights.
 #'
 #' @export
-optimize_weights <- function(results, methods, reference_gene_ids) {
+optimize_weights <- function(results, methods, reference_gene_ids,
+                             target = "mean") {
     # Create the named list from the factors vector.
     weights <- function(factors) {
         result <- NULL
@@ -50,13 +53,20 @@ optimize_weights <- function(results, methods, reference_gene_ids) {
         result
     }
 
-    # Compute the mean rank of the reference genes when applying the weights.
-    mean_rank <- function(factors) {
+    # Compute the target rank of the reference genes when applying the weights.
+    target_rank <- function(factors) {
         data <- ranking(results, weights(factors))
-        data[gene %chin% reference_gene_ids, mean(rank)]
+
+        data[gene %chin% reference_gene_ids, if (target == "min") {
+            min(rank)
+        } else if (target == "max") {
+            max(rank)
+        } else {
+            mean(rank)
+        }]
     }
 
-    factors <- stats::optim(rep(1.0, length(methods)), mean_rank)$par
+    factors <- stats::optim(rep(1.0, length(methods)), target_rank)$par
     total_weight <- sum(factors)
 
     weights(factors / total_weight)
