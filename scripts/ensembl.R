@@ -2,8 +2,9 @@ library(data.table)
 
 rlog::log_info("Connecting to Ensembl API")
 
-#' Object to access the Ensembl API.
-ensembl <- biomaRt::useEnsembl("ensembl")
+# Object to access the Ensembl API. We use the US east mirror to circumvent
+# current issues with the main server being temporarily unreliable.
+ensembl <- biomaRt::useEnsembl("ensembl", host = "useast.ensembl.org")
 
 # Retrieve species information.
 
@@ -18,11 +19,22 @@ species <- ensembl_datasets[, .(
 
 #' Get all chromosome names for an Ensembl dataset.
 #'
-#' Valid chromosome names include decimal numbers as well as typical sex
-#' chromosome names (X, Y, W and Z).
+#' The following chromosome naming schemes will be recognized and have been
+#' sourced from Ensembl by manually screening chromosome-level assemblies.
+#'
+#'  - a decimal number (most species' autosomes)
+#'  - X, Y, W or Z (gonosomes)
+#'  - LG followed by a decimal number (some fishes)
+#'  - ssa/sgr followed by a number (Atlantic salmon/Turquoise killifish)
+#'
+#' The function tries to filter out those chromosome names from the available
+#' assemblies in the dataset.
 get_chromosome_names <- function(dataset) {
     chromosome_names <- biomaRt::listFilterOptions(dataset, "chromosome_name")
-    chromosome_names[stringr::str_which(chromosome_names, "^[0-9]+|[XYWZ]$")]
+    chromosome_names[stringr::str_which(
+        chromosome_names,
+        "^(LG|sgr|ssa)?[0-9]+|[XYWZ]$"
+    )]
 }
 
 # Retrieve information on human genes. This will only include genes on
@@ -66,6 +78,7 @@ human_data[, chromosome_length := max(end_position), by = chromosome_name]
 distances <- human_data[, .(
     species = "hsapiens",
     gene = ensembl_gene_id,
+    position = start_position,
     distance = pmin(
         start_position,
         chromosome_length - end_position
@@ -86,7 +99,6 @@ for (species_id in species[!id == "hsapiens", id]) {
     # skipped.
     if (!"hsapiens_homolog_ensembl_gene" %chin%
         biomaRt::listAttributes(dataset, what = "name")) {
-
         rlog::log_info("No data on human orthologs")
         species <- species[id != species_id]
 
@@ -117,6 +129,11 @@ for (species_id in species[!id == "hsapiens", id]) {
         mart = dataset
     ))
 
+    # Only include human genes that we have information on.
+    species_distances <- species_distances[
+        hsapiens_homolog_ensembl_gene %chin% genes$id
+    ]
+
     # Only include one ortholog per human gene.
     species_distances <- unique(
         species_distances,
@@ -133,6 +150,7 @@ for (species_id in species[!id == "hsapiens", id]) {
     species_distances <- species_distances[, .(
         species = species_id,
         gene = hsapiens_homolog_ensembl_gene,
+        position = start_position,
         distance = pmin(
             start_position,
             chromosome_length - end_position
