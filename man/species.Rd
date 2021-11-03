@@ -5,7 +5,7 @@
 \alias{species}
 \title{Information on included species from the Ensembl database.}
 \format{
-A \link{data.table} with 91 rows and 2 variables:
+A \link{data.table} with 99 rows and 2 variables:
 \describe{
 \item{id}{Unique species ID}
 \item{name}{Human readable species name}

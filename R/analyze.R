@@ -1,36 +1,6 @@
-#' Create a new preset.
-#'
-#' A preset is used to specify which methods and inputs should be used for an
-#' analysis. Note that the genes to process should normally include the
-#' reference genes to be able to assess the results later.
-#'
-#' Available methods are:
-#'
-#'  - `clusteriness` How much the gene distances cluster across species.
-#'  - `correlation` The mean correlation with the reference genes.
-#'  - `proximity` Mean proximity to telomeres.
-#'  - `neural` Assessment by neural network.
-#'
-#' @param methods IDs of methods to apply.
-#' @param species IDs of species to include.
-#' @param genes IDs of genes to screen.
-#' @param reference_genes IDs of reference genes to compare to.
-#'
-#' @return The preset to use with [analyze()].
-#'
-#' @export
-preset <- function(methods, species, genes, reference_genes) {
-    list(
-        method_ids = sort(methods),
-        species_ids = sort(species),
-        gene_ids = sort(genes),
-        reference_gene_ids = sort(reference_genes)
-    )
-}
-
 #' Analyze by applying the specified preset.
 #'
-#' @param preset The preset to use which can be created using [preset()].
+#' @param preset The preset to use which should be created using [preset()].
 #' @param progress A function to be called for progress information. The
 #'   function should accept a number between 0.0 and 1.0 for the current
 #'   progress.
@@ -41,6 +11,10 @@ preset <- function(methods, species, genes, reference_genes) {
 #'
 #' @export
 analyze <- function(preset, progress = NULL) {
+    if (class(preset) != "geposan_preset") {
+        stop("Preset is invalid. Use geposan::preset() to create one.")
+    }
+
     # Available methods by ID.
     #
     # A method describes a way to perform a computation on gene distance data
@@ -64,9 +38,11 @@ analyze <- function(preset, progress = NULL) {
         method_count <- length(preset$method_ids)
         results <- data.table(gene = preset$gene_ids)
 
-        for (method_id in preset$method_ids) {
-            method_progress <- if (!is.null(progress)) function(p) {
-                progress(total_progress + p / method_count)
+        for (method_id in preset$methods) {
+            method_progress <- if (!is.null(progress)) {
+                function(p) {
+                    progress(total_progress + p / method_count)
+                }
             }
 
             method_results <- methods[[method_id]](preset, method_progress)

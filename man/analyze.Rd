@@ -7,7 +7,7 @@
 analyze(preset, progress = NULL)
 }
 \arguments{
-\item{preset}{The preset to use which can be created using \code{\link[=preset]{preset()}}.}
+\item{preset}{The preset to use which should be created using \code{\link[=preset]{preset()}}.}
 
 \item{progress}{A function to be called for progress information. The
 function should accept a number between 0.0 and 1.0 for the current
