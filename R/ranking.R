@@ -37,6 +37,62 @@ ranking <- function(analysis, weights) {
     )
 }
 
+#' S3 method for plotting a ranking.
+#'
+#' @param gene_sets A list of gene sets (containing vectors of gene IDs) that
+#'   will be highlighted in the plot.
+#' @param labels Labels for the gene sets.
+#'
+#' @seealso ranking()
+#'
+#' @export
+plot.geposan_ranking <- function(ranking, gene_sets = NULL, labels = NULL) {
+    if (!requireNamespace("plotly", quietly = TRUE)) {
+        stop("Please install \"plotly\" to use this function.")
+    }
+
+    plot <- plotly::plot_ly() |>
+        plotly::add_trace(
+            data = ranking,
+            x = ~rank,
+            y = ~score,
+            color = "All genes",
+            type = "scatter",
+            mode = "markers",
+            hoverinfo = "skip"
+        ) |>
+        plotly::layout(
+            xaxis = list(title = "Rank"),
+            yaxis = list(title = "Score")
+        )
+
+    if (length(gene_sets) > 0) {
+        # Take out the genes to be highlighted.
+        gene_set_data <- ranking[gene %chin% unlist(gene_sets)]
+
+        # Add labels for each gene set.
+        for (i in seq_along(gene_sets)) {
+            gene_set_data[gene %chin% gene_sets[[i]], label := labels[i]]
+        }
+
+        # Include gene information which will be used for laebling
+        gene_set_data <- merge(gene_set_data, genes, by.x = "gene", by.y = "id")
+
+        plot <- plot |> plotly::add_trace(
+            data = gene_set_data,
+            x = ~rank,
+            y = ~score,
+            color = ~label,
+            text = ~name,
+            type = "scatter",
+            mode = "markers",
+            marker = list(size = 20)
+        )
+    }
+
+    plot
+}
+
 #' Find the best weights to rank the results.
 #'
 #' This function finds the optimal parameters to [ranking()] that result in the
