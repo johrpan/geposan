@@ -4,14 +4,20 @@
 \alias{ranking}
 \title{Rank the results by computing a score.}
 \usage{
-ranking(results, weights)
+ranking(analysis, weights)
 }
 \arguments{
-\item{results}{Results from \code{\link[=analyze]{analyze()}}.}
+\item{analysis}{Analysis object resulting from \code{\link[=analyze]{analyze()}}.}
 
-\item{weights}{Named list pairing method names with weighting factors.}
+\item{weights}{Named list pairing method names with weighting factors. Only
+methods that are contained within this list will be included.}
+}
+\value{
+A ranking object. The object extends the analysis with additional
+columns containing the \code{score} and the \code{rank} of each gene. It will be
+ordered by rank.
 }
 \description{
-This function takes the result from \code{\link[=analyze]{analyze()}} and creates a score by
+This function takes the result of \code{\link[=analyze]{analyze()}} and creates a score by
 computing a weighted mean across the different methods' results.
 }

@@ -1,29 +1,40 @@
 #' Rank the results by computing a score.
 #'
-#' This function takes the result from [analyze()] and creates a score by
+#' This function takes the result of [analyze()] and creates a score by
 #' computing a weighted mean across the different methods' results.
 #'
-#' @param results Results from [analyze()].
-#' @param weights Named list pairing method names with weighting factors.
+#' @param analysis Analysis object resulting from [analyze()].
+#' @param weights Named list pairing method names with weighting factors. Only
+#'   methods that are contained within this list will be included.
 #'
-#' @result The input data with an additional column containing the score and
-#'   another column containing the rank.
+#' @returns A ranking object. The object extends the analysis with additional
+#'   columns containing the `score` and the `rank` of each gene. It will be
+#'   ordered by rank.
 #'
 #' @export
-ranking <- function(results, weights) {
-    results <- copy(results)
-    results[, score := 0.0]
+ranking <- function(analysis, weights) {
+    if (!"geposan_analysis" %chin% class(analysis)) {
+        stop("Invalid analyis. Use geposan::analyze().")
+    }
+
+    ranking <- copy(analysis)
+    ranking[, score := 0.0]
 
     for (method in names(weights)) {
-        weighted <- weights[[method]] * results[, ..method]
-        results[, score := score + weighted]
+        weighted <- weights[[method]] * ranking[, ..method]
+        ranking[, score := score + weighted]
     }
 
     # Normalize scores to be between 0.0 and 1.0.
-    results[, score := score / sum(unlist(weights))]
+    ranking[, score := score / sum(unlist(weights))]
 
-    setorder(results, -score)
-    results[, rank := .I]
+    setorder(ranking, -score)
+    ranking[, rank := .I]
+
+    structure(
+        ranking,
+        class = c("geposan_ranking", "geposan_analysis", class(ranking))
+    )
 }
 
 #' Find the best weights to rank the results.
@@ -31,17 +42,22 @@ ranking <- function(results, weights) {
 #' This function finds the optimal parameters to [ranking()] that result in the
 #' reference genes ranking particulary high.
 #'
-#' @param results Results from [analyze()] or [ranking()].
+#' @param analysis Results from [analyze()] or [ranking()].
 #' @param methods Methods to include in the score.
 #' @param reference_gene_ids IDs of the reference genes.
 #' @param target The optimization target. It may be one of "mean", "min" or
 #'   "max" and results in the respective rank being optimized.
 #'
-#' @returns Named list pairing method names with their optimal weights.
+#' @returns Named list pairing method names with their optimal weights. This
+#'   can be used as an argument to [ranking()].
 #'
 #' @export
-optimize_weights <- function(results, methods, reference_gene_ids,
-                             target = "mean") {
+optimal_weights <- function(analysis, methods, reference_gene_ids,
+                            target = "mean") {
+    if (!"geposan_analysis" %chin% class(analysis)) {
+        stop("Invalid analyis. Use geposan::analyze().")
+    }
+
     # Create the named list from the factors vector.
     weights <- function(factors) {
         result <- NULL
@@ -55,7 +71,7 @@ optimize_weights <- function(results, methods, reference_gene_ids,
 
     # Compute the target rank of the reference genes when applying the weights.
     target_rank <- function(factors) {
-        data <- ranking(results, weights(factors))
+        data <- ranking(analysis, weights(factors))
 
         data[gene %chin% reference_gene_ids, if (target == "min") {
             min(rank)

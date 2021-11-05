@@ -2,7 +2,7 @@
 
 S3method(print,geposan_preset)
 export(analyze)
-export(optimize_weights)
+export(optimal_weights)
 export(preset)
 export(ranking)
 import(data.table)
