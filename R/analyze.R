@@ -35,7 +35,19 @@ analyze <- function(preset, progress = NULL) {
         "clusteriness" = clusteriness,
         "correlation" = correlation,
         "proximity" = proximity,
-        "neural" = neural
+        "neural" = neural,
+        "clusteriness_positions" = function(...) {
+            clusteriness(..., use_positions = TRUE)
+        },
+        "correlation_positions" = function(...) {
+            correlation(..., use_positions = TRUE)
+        },
+        "proximity_positions" = function(...) {
+            proximity(..., use_positions = TRUE)
+        },
+        "neural_positions" = function(...) {
+            neural(..., use_positions = TRUE)
+        }
     )
 
     results <- cached("analysis", preset, {
@@ -50,7 +62,11 @@ analyze <- function(preset, progress = NULL) {
                 }
             }
 
-            method_results <- methods[[method_id]](preset, method_progress)
+            method_results <- methods[[method_id]](
+                preset,
+                progress = method_progress
+            )
+
             setnames(method_results, "score", method_id)
 
             results <- merge(

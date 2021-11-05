@@ -2,21 +2,26 @@
 #
 # A score will be given to each gene such that 0.0 corresponds to the maximal
 # mean distance across all genes and 1.0 corresponds to a distance of 0.
-proximity <- function(preset, progress = NULL) {
+proximity <- function(preset, use_positions = FALSE, progress = NULL) {
     species_ids <- preset$species_ids
     gene_ids <- preset$gene_ids
 
-    cached("proximity", c(species_ids, gene_ids), {
+    cached("proximity", c(species_ids, gene_ids, use_positions), {
         # Prefilter distances by species and gene.
-        distances <- geposan::distances[
+        data <- geposan::distances[
             species %chin% preset$species_ids & gene %chin% preset$gene_ids
         ]
 
         # Compute the score as described above.
 
-        distances <- distances[, .(mean_distance = mean(distance)), by = "gene"]
-        max_distance <- distances[, max(mean_distance)]
-        distances[, score := 1 - mean_distance / max_distance]
+        data <- if (use_positions) {
+            data[, .(mean_distance = mean(position)), by = "gene"]
+        } else {
+            data[, .(mean_distance = mean(distance)), by = "gene"]
+        }
+
+        max_distance <- data[, max(mean_distance)]
+        data[, score := 1 - mean_distance / max_distance]
 
         if (!is.null(progress)) {
             # We do everything in one go, so it's not possible to report
@@ -25,6 +30,6 @@ proximity <- function(preset, progress = NULL) {
             progress(1.0)
         }
 
-        distances[, .(gene, score)]
+        data[, .(gene, score)]
     })
 }
