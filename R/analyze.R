@@ -5,9 +5,10 @@
 #'   function should accept a number between 0.0 and 1.0 for the current
 #'   progress.
 #'
-#' @return A [data.table] with one row for each gene identified by it's ID
-#'   (`gene` column). The additional columns contain the resulting scores per
-#'   method and are named after the method IDs.
+#' @return An object containing the results of the analysis. It contains a
+#'   [data.table] with one row for each gene identified by it's ID (`gene`
+#'   column). The additional columns contain the resulting scores per method
+#'   and are named after the method IDs.
 #'
 #' @export
 analyze <- function(preset, progress = NULL) {
@@ -33,10 +34,10 @@ analyze <- function(preset, progress = NULL) {
         "neural" = neural
     )
 
-    cached("results", preset, {
+    analysis <- cached("analysis", preset, {
         total_progress <- 0.0
-        method_count <- length(preset$method_ids)
-        results <- data.table(gene = preset$gene_ids)
+        method_count <- length(preset$methods)
+        analysis <- data.table(gene = preset$gene_ids)
 
         for (method_id in preset$methods) {
             method_progress <- if (!is.null(progress)) {
@@ -48,8 +49,8 @@ analyze <- function(preset, progress = NULL) {
             method_results <- methods[[method_id]](preset, method_progress)
             setnames(method_results, "score", method_id)
 
-            results <- merge(
-                results,
+            analysis <- merge(
+                analysis,
                 method_results,
                 by = "gene"
             )
@@ -61,6 +62,11 @@ analyze <- function(preset, progress = NULL) {
             progress(1.0)
         }
 
-        results
+        analysis
     })
+
+    structure(
+        analysis,
+        class = c("geposan_analysis", class(analysis))
+    )
 }
