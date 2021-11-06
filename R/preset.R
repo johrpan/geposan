@@ -43,24 +43,27 @@ preset <- function(methods = c(
 
 #' S3 method to print a preset object.
 #'
+#' @param x The preset to print.
+#' @param ... Other parameters.
+#'
 #' @seealso [preset()]
 #'
 #' @export
-print.geposan_preset <- function(preset, ...) {
+print.geposan_preset <- function(x, ...) {
     cat("geposan preset:")
     cat("\n  Included methods: ")
-    cat(preset$method_ids, sep = ", ")
+    cat(x$method_ids, sep = ", ")
 
     cat(sprintf(
         "\n  Input data: %i species, %i genes",
-        length(preset$species_ids),
-        length(preset$gene_ids)
+        length(x$species_ids),
+        length(x$gene_ids)
     ))
 
     cat(sprintf(
         "\n  Comparison data: %i reference genes\n",
-        length(preset$reference_gene_ids)
+        length(x$reference_gene_ids)
     ))
 
-    invisible(preset)
+    invisible(x)
 }

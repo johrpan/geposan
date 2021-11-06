@@ -4,7 +4,12 @@
 \alias{print.geposan_comparison}
 \title{S3 method to print a comparison object.}
 \usage{
-\method{print}{geposan_comparison}(comparison, ...)
+\method{print}{geposan_comparison}(x, ...)
+}
+\arguments{
+\item{x}{The comparison to print.}
+
+\item{...}{Other parameters.}
 }
 \description{
 S3 method to print a comparison object.

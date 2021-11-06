@@ -4,7 +4,12 @@
 \alias{print.geposan_preset}
 \title{S3 method to print a preset object.}
 \usage{
-\method{print}{geposan_preset}(preset, ...)
+\method{print}{geposan_preset}(x, ...)
+}
+\arguments{
+\item{x}{The preset to print.}
+
+\item{...}{Other parameters.}
 }
 \description{
 S3 method to print a preset object.

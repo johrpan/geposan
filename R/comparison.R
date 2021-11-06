@@ -24,7 +24,7 @@ compare <- function(ranking, comparison_gene_ids) {
 
     comparison_ranking <- ranking[gene %chin% comparison_gene_ids]
 
-    p_value <- wilcox.test(
+    p_value <- stats::wilcox.test(
         x = comparison_ranking[, score],
         y = ranking[!gene %chin% comparison_gene_ids, score],
         alternative = "greater"
@@ -46,10 +46,13 @@ compare <- function(ranking, comparison_gene_ids) {
 
 #' S3 method to print a comparison object.
 #'
+#' @param x The comparison to print.
+#' @param ... Other parameters.
+#'
 #' @seealso [compare()]
 #'
 #' @export
-print.geposan_comparison <- function(comparison, ...) {
+print.geposan_comparison <- function(x, ...) {
     cat("geposan comparison:")
     cat(sprintf(
         paste(
@@ -62,14 +65,14 @@ print.geposan_comparison <- function(comparison, ...) {
             "\n\n  p-value for better ranking: %.4f\n",
             sep = ""
         ),
-        comparison$mean,
-        comparison$min,
-        comparison$max,
-        comparison$mean_rank,
-        comparison$first_rank,
-        comparison$last_rank,
-        comparison$p_value
+        x$mean,
+        x$min,
+        x$max,
+        x$mean_rank,
+        x$first_rank,
+        x$last_rank,
+        x$p_value
     ))
 
-    invisible(comparison)
+    invisible(x)
 }

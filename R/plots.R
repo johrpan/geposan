@@ -41,7 +41,12 @@ plot_scores <- function(ranking, gene_sets = NULL, labels = NULL) {
         }
 
         # Include gene information which will be used for labeling
-        gene_set_data <- merge(gene_set_data, genes, by.x = "gene", by.y = "id")
+        gene_set_data <- merge(
+            gene_set_data,
+            geposan::genes,
+            by.x = "gene",
+            by.y = "id"
+        )
 
         plot <- plot |> plotly::add_trace(
             data = gene_set_data,
