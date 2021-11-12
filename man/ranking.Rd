@@ -13,9 +13,9 @@ ranking(analysis, weights)
 methods that are contained within this list will be included.}
 }
 \value{
-A ranking object. The object extends the analysis with additional
-columns containing the \code{score} and the \code{rank} of each gene. It will be
-ordered by rank.
+A ranking object. The object extends the analysis result with
+additional columns containing the \code{score} and the \code{rank} of each gene. It
+will be ordered by rank.
 }
 \description{
 This function takes the result of \code{\link[=analyze]{analyze()}} and creates a score by

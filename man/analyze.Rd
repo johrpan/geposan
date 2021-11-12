@@ -14,10 +14,14 @@ function should accept a number between 0.0 and 1.0 for the current
 progress.}
 }
 \value{
-An object containing the results of the analysis. It contains a
-\link{data.table} with one row for each gene identified by it's ID (\code{gene}
-column). The additional columns contain the resulting scores per method
-and are named after the method IDs.
+An object containing the results of the analysis with the following
+items:
+\describe{
+\item{\code{preset}}{The preset that was used.}
+\item{\code{results}}{A \link{data.table} with one row for each gene identified by
+it's ID (\code{gene} column). The additional columns contain the resulting
+scores per method and are named after the method IDs.}
+}
 }
 \description{
 Analyze by applying the specified preset.

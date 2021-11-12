@@ -7,9 +7,9 @@
 #' @param weights Named list pairing method names with weighting factors. Only
 #'   methods that are contained within this list will be included.
 #'
-#' @returns A ranking object. The object extends the analysis with additional
-#'   columns containing the `score` and the `rank` of each gene. It will be
-#'   ordered by rank.
+#' @returns A ranking object. The object extends the analysis result with
+#'   additional columns containing the `score` and the `rank` of each gene. It
+#'   will be ordered by rank.
 #'
 #' @export
 ranking <- function(analysis, weights) {
@@ -17,7 +17,7 @@ ranking <- function(analysis, weights) {
         stop("Invalid analyis. Use geposan::analyze().")
     }
 
-    ranking <- copy(analysis)
+    ranking <- copy(analysis$results)
     ranking[, score := 0.0]
 
     for (method in names(weights)) {
