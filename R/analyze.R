@@ -53,7 +53,7 @@ analyze <- function(preset, progress = NULL) {
             method_results <- methods[[method_id]](preset, method_progress)
             setnames(method_results, "score", method_id)
 
-            analysis <- merge(
+            results <- merge(
                 results,
                 method_results,
                 by = "gene"

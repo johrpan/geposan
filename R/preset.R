@@ -52,7 +52,7 @@ preset <- function(methods = c(
 print.geposan_preset <- function(x, ...) {
     cat("geposan preset:")
     cat("\n  Included methods: ")
-    cat(x$method_ids, sep = ", ")
+    cat(x$methods, sep = ", ")
 
     cat(sprintf(
         "\n  Input data: %i species, %i genes",
