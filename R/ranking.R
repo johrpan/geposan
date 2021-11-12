@@ -6,19 +6,33 @@
 #' @param analysis Analysis object resulting from [analyze()].
 #' @param weights Named list pairing method names with weighting factors. Only
 #'   methods that are contained within this list will be included.
+#' @param min_n_species Minimum number of required species per gene. Genes that
+#'   have fewer species will not be included in the ranking.
 #'
 #' @returns A ranking object. The object extends the analysis result with
 #'   additional columns containing the `score` and the `rank` of each gene. It
 #'   will be ordered by rank.
 #'
 #' @export
-ranking <- function(analysis, weights) {
+ranking <- function(analysis, weights, min_n_species = 10) {
     if (!"geposan_analysis" %chin% class(analysis)) {
         stop("Invalid analyis. Use geposan::analyze().")
     }
 
-    ranking <- copy(analysis$results)
-    ranking[, score := 0.0]
+    # Count included species from the preset per gene.
+    genes_n_species <- geposan::distances[
+        species %chin% analysis$preset$species_ids,
+        .(n_species = .N),
+        by = "gene"
+    ]
+
+    setkey(genes_n_species, gene)
+
+    # Exclude genes with too few species.
+    ranking <- analysis$results[
+        genes_n_species[gene, n_species] >= min_n_species,
+        .(score = 0.0)
+    ]
 
     for (method in names(weights)) {
         weighted <- weights[[method]] * ranking[, ..method]
@@ -47,13 +61,16 @@ ranking <- function(analysis, weights) {
 #' @param reference_gene_ids IDs of the reference genes.
 #' @param target The optimization target. It may be one of "mean", "min" or
 #'   "max" and results in the respective rank being optimized.
+#' @param min_n_species Minimum number of required species per gene. Genes that
+#'   have fewer species will not be included in the rankings used to find the
+#'   optimal weights.
 #'
 #' @returns Named list pairing method names with their optimal weights. This
 #'   can be used as an argument to [ranking()].
 #'
 #' @export
 optimal_weights <- function(analysis, methods, reference_gene_ids,
-                            target = "mean") {
+                            target = "mean", min_n_species = 10) {
     if (!"geposan_analysis" %chin% class(analysis)) {
         stop("Invalid analyis. Use geposan::analyze().")
     }
@@ -71,7 +88,11 @@ optimal_weights <- function(analysis, methods, reference_gene_ids,
 
     # Compute the target rank of the reference genes when applying the weights.
     target_rank <- function(factors) {
-        data <- ranking(analysis, weights(factors))
+        data <- ranking(
+            analysis,
+            weights(factors),
+            min_n_species = min_n_species
+        )
 
         data[gene %chin% reference_gene_ids, if (target == "min") {
             min(rank)
