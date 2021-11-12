@@ -30,9 +30,10 @@ ranking <- function(analysis, weights, min_n_species = 10) {
 
     # Exclude genes with too few species.
     ranking <- analysis$results[
-        genes_n_species[gene, n_species] >= min_n_species,
-        .(score = 0.0)
+        genes_n_species[gene, n_species] >= min_n_species
     ]
+
+    ranking[, score := 0.0]
 
     for (method in names(weights)) {
         weighted <- weights[[method]] * ranking[, ..method]
