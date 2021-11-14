@@ -41,10 +41,7 @@ analyze <- function(preset, progress = NULL) {
             correlation(..., use_positions = TRUE)
         },
         "proximity" = proximity,
-        "neural" = neural,
-        "neural_positions" = function(...) {
-            neural(..., use_positions = TRUE)
-        }
+        "neural" = neural
     )
 
     results <- cached("analysis", preset, {

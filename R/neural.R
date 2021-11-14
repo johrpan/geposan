@@ -1,17 +1,14 @@
 # Find genes by training a neural network on reference position data.
 #
 # @param seed A seed to get reproducible results.
-neural <- function(preset,
-                   use_positions = FALSE,
-                   progress = NULL,
-                   seed = 448077) {
+neural <- function(preset, progress = NULL, seed = 448077) {
     species_ids <- preset$species_ids
     gene_ids <- preset$gene_ids
     reference_gene_ids <- preset$reference_gene_ids
 
     cached(
         "neural",
-        c(species_ids, gene_ids, reference_gene_ids, use_positions),
+        c(species_ids, gene_ids, reference_gene_ids),
         { # nolint
             set.seed(seed)
             gene_count <- length(gene_ids)
@@ -29,27 +26,20 @@ neural <- function(preset,
             # enough data.
             species_ids_included <- NULL
 
-            # Make a column containing distance data for each species.
+            # Make a column containing positions for each species.
             for (species_id in species_ids) {
-                species_data <- if (use_positions) {
-                    setnames(distances[
-                        species == species_id,
-                        .(gene, position)
-                    ], "position", "distance")
-                } else {
-                    distances[
-                        species == species_id,
-                        .(gene, distance)
-                    ]
-                }
+                species_data <- distances[
+                    species == species_id,
+                    .(gene, position)
+                ]
 
                 # Only include species with at least 25% known values.
 
-                species_distances <- stats::na.omit(species_data)
+                species_data <- stats::na.omit(species_data)
 
-                if (nrow(species_distances) >= 0.25 * gene_count) {
+                if (nrow(species_data) >= 0.25 * gene_count) {
                     species_ids_included <- c(species_ids_included, species_id)
-                    data <- merge(data, species_distances, all.x = TRUE)
+                    data <- merge(data, species_data, all.x = TRUE)
 
                     # Replace missing data with mean values. The neural network
                     # can't handle NAs in a meaningful way. Choosing extreme
@@ -58,11 +48,11 @@ neural <- function(preset,
                     # However, this will of course lessen the significance of
                     # the results.
 
-                    mean_distance <- round(species_distances[, mean(distance)])
-                    data[is.na(distance), distance := mean_distance]
+                    mean_position <- round(species_data[, mean(position)])
+                    data[is.na(position), position := mean_position]
 
                     # Name the new column after the species.
-                    setnames(data, "distance", species_id)
+                    setnames(data, "position", species_id)
                 }
             }
 
