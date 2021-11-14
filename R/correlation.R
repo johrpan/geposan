@@ -31,10 +31,10 @@ correlation <- function(preset, use_positions = FALSE, progress = NULL) {
                         .(gene, distance)
                     ]
                 }
-            }
 
-            data <- merge(data, species_data, all.x = TRUE)
-            setnames(data, "distance", species_id)
+                data <- merge(data, species_data, all.x = TRUE)
+                setnames(data, "distance", species_id)
+            }
 
             # Transpose to the desired format.
             data <- transpose(data, make.names = "gene")
