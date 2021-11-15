@@ -1,3 +1,68 @@
+#' Plot gene positions.
+#'
+#' This function requires the package `plotly`.
+#'
+#' @param species_ids IDs of species to show in the plot.
+#' @param gene_sets A list of gene sets (containing vectors of gene IDs) that
+#'   will be highlighted in the plot.
+#' @param labels Labels for the gene sets. This is required if gene sets are
+#'   given and has to have the same length.
+#' @param use_positions Whether to display positions instead of distances.
+#'
+#' @export
+plot_positions <- function(species_ids,
+                           gene_sets,
+                           labels,
+                           use_positions = FALSE) {
+    if (!requireNamespace("plotly", quietly = TRUE)) {
+        stop("Please install \"plotly\" to use this function.")
+    }
+
+    data <- merge(
+        geposan::distances[gene %chin% unlist(gene_sets) &
+            species %chin% species_ids],
+        geposan::genes[, .(id, name)],
+        by.x = "gene", by.y = "id"
+    )
+
+    if (use_positions) {
+        data[, value := position]
+    } else {
+        data[, value := distance]
+    }
+
+    # Add labels for each gene set.
+    for (i in seq_along(gene_sets)) {
+        data[gene %chin% gene_sets[[i]], label := labels[i]]
+    }
+
+    species <- geposan::species[id %chin% species_ids]
+
+    yaxis_title <- if (use_positions) {
+        "Position [Bp]"
+    } else {
+        "Distance to telomeres [Bp]"
+    }
+
+    plotly::plot_ly(
+        data = data,
+        x = ~species,
+        y = ~value,
+        color = ~label,
+        text = ~name,
+        type = "scatter",
+        mode = "markers"
+    ) |> plotly::layout(
+        xaxis = list(
+            title = "Species",
+            tickvals = species$id,
+            ticktext = species$name
+        ),
+        yaxis = list(title = yaxis_title)
+    )
+}
+
+
 #' Plot a ranking as a scatter plot of scores.
 #'
 #' This function requires the package `plotly`.
