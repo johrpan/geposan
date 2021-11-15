@@ -4,7 +4,7 @@
 \alias{plot_scores}
 \title{Plot a ranking as a scatter plot of scores.}
 \usage{
-plot_scores(ranking, gene_sets = NULL, labels = NULL)
+plot_scores(ranking, gene_sets = NULL, labels = NULL, max_rank = NULL)
 }
 \arguments{
 \item{ranking}{The ranking to visualize.}
@@ -14,6 +14,9 @@ will be highlighted in the plot.}
 
 \item{labels}{Labels for the gene sets. This is required if gene sets are
 given and has to have the same length.}
+
+\item{max_rank}{The maximum rank of the highlighted genes. All genes that
+are ranked lower will appear greyed out.}
 }
 \description{
 This function requires the package \code{plotly}.

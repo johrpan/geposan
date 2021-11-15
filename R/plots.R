@@ -7,11 +7,16 @@
 #'   will be highlighted in the plot.
 #' @param labels Labels for the gene sets. This is required if gene sets are
 #'   given and has to have the same length.
+#' @param max_rank The maximum rank of the highlighted genes. All genes that
+#'   are ranked lower will appear greyed out.
 #'
 #' @seealso ranking()
 #'
 #' @export
-plot_scores <- function(ranking, gene_sets = NULL, labels = NULL) {
+plot_scores <- function(ranking,
+                        gene_sets = NULL,
+                        labels = NULL,
+                        max_rank = NULL) {
     if (!requireNamespace("plotly", quietly = TRUE)) {
         stop("Please install \"plotly\" to use this function.")
     }
@@ -58,6 +63,26 @@ plot_scores <- function(ranking, gene_sets = NULL, labels = NULL) {
             mode = "markers",
             marker = list(size = 20)
         )
+    }
+
+
+    if (!is.null(max_rank)) {
+        first_not_included_rank <- max_rank + 1
+        last_rank <- ranking[, .N]
+
+        if (first_not_included_rank <= last_rank) {
+            plot <- plot |> plotly::layout(
+                shapes = list(
+                    type = "rect",
+                    fillcolor = "black",
+                    opacity = 0.1,
+                    x0 = first_not_included_rank,
+                    x1 = last_rank,
+                    y0 = 0.0,
+                    y1 = 1.0
+                )
+            )
+        }
     }
 
     plot
