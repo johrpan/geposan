@@ -41,7 +41,10 @@ ranking <- function(analysis, weights, min_n_species = 10) {
     }
 
     # Normalize scores to be between 0.0 and 1.0.
-    ranking[, score := score / sum(unlist(weights))]
+    min_score <- ranking[, min(score)]
+    max_score <- ranking[, max(score)]
+    score_range <- max_score - min_score
+    ranking[, score := (score - min_score) / score_range]
 
     setorder(ranking, -score)
     ranking[, rank := .I]
@@ -95,18 +98,25 @@ optimal_weights <- function(analysis, methods, reference_gene_ids,
             min_n_species = min_n_species
         )
 
-        data[gene %chin% reference_gene_ids, if (target == "min") {
+        result <- data[gene %chin% reference_gene_ids, if (target == "min") {
             min(rank)
         } else if (target == "max") {
             max(rank)
         } else {
             mean(rank)
         }]
+
+        if (result > 0) {
+            result
+        } else {
+            Inf
+        }
     }
 
-    factors <- stats::optim(rep(1.0, length(methods)), target_rank)$par
-    factors[factors < 0.0] <- 0.0
-    total_weight <- sum(factors)
+    factors <- stats::optim(
+        rep(0.0, length(methods)),
+        target_rank
+    )$par
 
-    weights(factors / total_weight)
+    weights(factors / max(abs(factors)))
 }
