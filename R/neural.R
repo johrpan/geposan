@@ -101,17 +101,32 @@ neural <- function(preset, progress = NULL, seed = 448077) {
             )
 
             if (!is.null(progress)) {
-                # We do everything in one go, so it's not possible to report
-                # detailed progress information. As the method is relatively
-                # quick, this should not be a problem.
-                progress(0.5)
+                progress(0.33)
             }
 
             # Apply the neural network.
             data[, score := neuralnet::compute(nn, data)$net.result]
 
+            # Reconstruct and run the neural network for each training gene
+            # by training it without the respective gene.
+            for (gene_id in training_data$gene) {
+                nn <- neuralnet::neuralnet(
+                    nn_formula,
+                    training_data[gene != gene_id],
+                    hidden = c(layer1, layer2, layer3),
+                    linear.output = FALSE
+                )
+
+                data[
+                    gene == gene_id,
+                    score := neuralnet::compute(
+                        nn,
+                        training_data[gene == gene_id]
+                    )$net.result
+                ]
+            }
+
             if (!is.null(progress)) {
-                # See above.
                 progress(1.0)
             }
 
