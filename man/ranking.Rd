@@ -4,16 +4,13 @@
 \alias{ranking}
 \title{Rank the results by computing a score.}
 \usage{
-ranking(analysis, weights, min_n_species = 10)
+ranking(analysis, weights)
 }
 \arguments{
 \item{analysis}{Analysis object resulting from \code{\link[=analyze]{analyze()}}.}
 
 \item{weights}{Named list pairing method names with weighting factors. Only
 methods that are contained within this list will be included.}
-
-\item{min_n_species}{Minimum number of required species per gene. Genes that
-have fewer species will not be included in the ranking.}
 }
 \value{
 A ranking object. The object extends the analysis result with

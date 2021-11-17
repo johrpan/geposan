@@ -8,6 +8,7 @@ preset(
   methods = c("clusteriness", "correlation", "neural", "proximity"),
   species_ids = NULL,
   gene_ids = NULL,
+  min_n_species = 10,
   reference_gene_ids = NULL
 )
 }
@@ -17,6 +18,9 @@ preset(
 \item{species_ids}{IDs of species to include.}
 
 \item{gene_ids}{IDs of genes to screen.}
+
+\item{min_n_species}{Minimum number of orthologs that a gene should have to
+be included in the analysis.}
 
 \item{reference_gene_ids}{IDs of reference genes to compare to.}
 }

@@ -4,13 +4,7 @@
 \alias{optimal_weights}
 \title{Find the best weights to rank the results.}
 \usage{
-optimal_weights(
-  analysis,
-  methods,
-  reference_gene_ids,
-  target = "mean",
-  min_n_species = 10
-)
+optimal_weights(analysis, methods, reference_gene_ids, target = "mean")
 }
 \arguments{
 \item{analysis}{Results from \code{\link[=analyze]{analyze()}} or \code{\link[=ranking]{ranking()}}.}
@@ -21,10 +15,6 @@ optimal_weights(
 
 \item{target}{The optimization target. It may be one of "mean", "min" or
 "max" and results in the respective rank being optimized.}
-
-\item{min_n_species}{Minimum number of required species per gene. Genes that
-have fewer species will not be included in the rankings used to find the
-optimal weights.}
 }
 \value{
 Named list pairing method names with their optimal weights. This

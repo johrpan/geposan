@@ -14,6 +14,8 @@
 #' @param methods Methods to apply.
 #' @param species_ids IDs of species to include.
 #' @param gene_ids IDs of genes to screen.
+#' @param min_n_species Minimum number of orthologs that a gene should have to
+#'   be included in the analysis.
 #' @param reference_gene_ids IDs of reference genes to compare to.
 #'
 #' @return The preset to use with [analyze()].
@@ -27,6 +29,7 @@ preset <- function(methods = c(
                    ),
                    species_ids = NULL,
                    gene_ids = NULL,
+                   min_n_species = 10,
                    reference_gene_ids = NULL) {
     # The included data gets sorted to be able to produce predictable hashes
     # for the object later.
@@ -35,6 +38,7 @@ preset <- function(methods = c(
             methods = sort(methods),
             species_ids = sort(species_ids),
             gene_ids = sort(gene_ids),
+            min_n_species = as.numeric(min_n_species),
             reference_gene_ids = sort(reference_gene_ids)
         ),
         class = "geposan_preset"
@@ -59,6 +63,8 @@ print.geposan_preset <- function(x, ...) {
         length(x$species_ids),
         length(x$gene_ids)
     ))
+
+    cat(sprintf("\n  Species per gene: \u2265 %i", x$min_n_species))
 
     cat(sprintf(
         "\n  Comparison data: %i reference genes\n",
