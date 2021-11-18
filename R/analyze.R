@@ -47,7 +47,7 @@ analyze <- function(preset, progress = NULL) {
         "proximity" = proximity
     )
 
-    results <- cached("analysis", preset, {
+    analysis <- cached("analysis", preset, {
         total_progress <- 0.0
         method_count <- length(preset$methods)
         results <- data.table(gene = preset$gene_ids)
@@ -75,18 +75,18 @@ analyze <- function(preset, progress = NULL) {
             total_progress <- total_progress + 1 / method_count
         }
 
-        results
+        structure(
+            list(
+                preset = preset,
+                results = results
+            ),
+            class = "geposan_analysis"
+        )
     })
 
     if (!is.null(progress)) {
         progress(1.0)
     }
 
-    structure(
-        list(
-            preset = preset,
-            results = results
-        ),
-        class = "geposan_analysis"
-    )
+    analysis
 }
