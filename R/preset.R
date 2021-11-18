@@ -2,20 +2,28 @@
 #'
 #' A preset is used to specify which methods and inputs should be used for an
 #' analysis. Note that the genes to process should normally include the
-#' reference genes to be able to assess the results later.
+#' reference genes to be able to assess the results later. The genes will be
+#' filtered based on how many species have data for them. Genes which only have
+#' orthologs for less than 25% of the input species will be excluded from the
+#' preset and the analyis.
 #'
 #' Available methods are:
 #'
-#'  - `clusteriness` How much the gene distances cluster across species.
-#'  - `correlation` The mean correlation with the reference genes.
+#'  - `clusteriness` How much the gene distances to the nearest telomere
+#'    cluster across species.
+#'  - `clusteriness_positions` The same as `clusteriness` but using absolute
+#'    gene positions instead of distances.
+#'  - `correlation` The mean correlation of gene distances to the nearest
+#'    telomere across species.
+#'  - `correlation_positions` Correlation using position data.
+#'  - `neural` Assessment by neural network trained using distances.
+#'  - `neural_positions` Assessment by neural network trained using absolute
+#'    position data.
 #'  - `proximity` Mean proximity to telomeres.
-#'  - `neural` Assessment by neural network.
 #'
 #' @param methods Methods to apply.
 #' @param species_ids IDs of species to include.
 #' @param gene_ids IDs of genes to screen.
-#' @param min_n_species Minimum number of orthologs that a gene should have to
-#'   be included in the analysis.
 #' @param reference_gene_ids IDs of reference genes to compare to.
 #'
 #' @return The preset to use with [analyze()].
@@ -23,22 +31,36 @@
 #' @export
 preset <- function(methods = c(
                        "clusteriness",
+                       "clusteriness_positions",
                        "correlation",
+                       "correlation_positions",
                        "neural",
+                       "neural_positions",
                        "proximity"
                    ),
                    species_ids = NULL,
                    gene_ids = NULL,
-                   min_n_species = 10,
                    reference_gene_ids = NULL) {
+    # Count included species per gene.
+    genes_n_species <- geposan::distances[
+        species %chin% species_ids,
+        .(n_species = .N),
+        by = "gene"
+    ]
+
+    # Filter out genes with less than 25% existing orthologs.
+    gene_ids_filtered <- genes_n_species[
+        n_species >= 0.25 * length(species_ids),
+        gene
+    ]
+
     # The included data gets sorted to be able to produce predictable hashes
     # for the object later.
     structure(
         list(
             methods = sort(methods),
             species_ids = sort(species_ids),
-            gene_ids = sort(gene_ids),
-            min_n_species = as.numeric(min_n_species),
+            gene_ids = sort(gene_ids_filtered),
             reference_gene_ids = sort(reference_gene_ids)
         ),
         class = "geposan_preset"
@@ -63,8 +85,6 @@ print.geposan_preset <- function(x, ...) {
         length(x$species_ids),
         length(x$gene_ids)
     ))
-
-    cat(sprintf("\n  Species per gene: \u2265 %i", x$min_n_species))
 
     cat(sprintf(
         "\n  Comparison data: %i reference genes\n",

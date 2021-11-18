@@ -75,17 +75,7 @@ analyze <- function(preset, progress = NULL) {
             total_progress <- total_progress + 1 / method_count
         }
 
-        # Count included species from the preset per gene.
-        genes_n_species <- geposan::distances[
-            species %chin% preset$species_ids,
-            .(n_species = .N),
-            by = "gene"
-        ]
-
-        setkey(genes_n_species, "gene")
-
-        # Return the results for genes with enough species.
-        results[genes_n_species[gene, n_species] >= preset$min_n_species]
+        results
     })
 
     if (!is.null(progress)) {

@@ -5,10 +5,10 @@
 \title{Create a new preset.}
 \usage{
 preset(
-  methods = c("clusteriness", "correlation", "neural", "proximity"),
+  methods = c("clusteriness", "clusteriness_positions", "correlation",
+    "correlation_positions", "neural", "neural_positions", "proximity"),
   species_ids = NULL,
   gene_ids = NULL,
-  min_n_species = 10,
   reference_gene_ids = NULL
 )
 }
@@ -19,9 +19,6 @@ preset(
 
 \item{gene_ids}{IDs of genes to screen.}
 
-\item{min_n_species}{Minimum number of orthologs that a gene should have to
-be included in the analysis.}
-
 \item{reference_gene_ids}{IDs of reference genes to compare to.}
 }
 \value{
@@ -30,14 +27,24 @@ The preset to use with \code{\link[=analyze]{analyze()}}.
 \description{
 A preset is used to specify which methods and inputs should be used for an
 analysis. Note that the genes to process should normally include the
-reference genes to be able to assess the results later.
+reference genes to be able to assess the results later. The genes will be
+filtered based on how many species have data for them. Genes which only have
+orthologs for less than 25\% of the input species will be excluded from the
+preset and the analyis.
 }
 \details{
 Available methods are:
 \itemize{
-\item \code{clusteriness} How much the gene distances cluster across species.
-\item \code{correlation} The mean correlation with the reference genes.
+\item \code{clusteriness} How much the gene distances to the nearest telomere
+cluster across species.
+\item \code{clusteriness_positions} The same as \code{clusteriness} but using absolute
+gene positions instead of distances.
+\item \code{correlation} The mean correlation of gene distances to the nearest
+telomere across species.
+\item \code{correlation_positions} Correlation using position data.
+\item \code{neural} Assessment by neural network trained using distances.
+\item \code{neural_positions} Assessment by neural network trained using absolute
+position data.
 \item \code{proximity} Mean proximity to telomeres.
-\item \code{neural} Assessment by neural network.
 }
 }
