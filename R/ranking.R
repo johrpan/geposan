@@ -13,11 +13,14 @@
 #'
 #' @export
 ranking <- function(analysis, weights) {
-    if (!"geposan_analysis" %chin% class(analysis)) {
+    if ("geposan_analysis" %chin% class(analysis)) {
+        ranking <- copy(analysis$ranking)
+    } else if ("geposan_results" %chin% class(analysis)) {
+        ranking <- copy(analysis)
+    } else {
         stop("Invalid analyis. Use geposan::analyze().")
     }
 
-    ranking <- copy(analysis$results)
     ranking[, score := 0.0]
 
     for (method in names(weights)) {
@@ -36,7 +39,7 @@ ranking <- function(analysis, weights) {
 
     structure(
         ranking,
-        class = c("geposan_ranking", "geposan_analysis", class(ranking))
+        class = c("geposan_ranking", "geposan_results", class(ranking))
     )
 }
 
@@ -57,24 +60,13 @@ ranking <- function(analysis, weights) {
 #' @export
 optimal_weights <- function(analysis, methods, reference_gene_ids,
                             target = "mean") {
-    if (!"geposan_analysis" %chin% class(analysis)) {
+    if (!any(c("geposan_analysis", "geposan_results") %chin% class(analysis))) {
         stop("Invalid analyis. Use geposan::analyze().")
-    }
-
-    # Create the named list from the factors vector.
-    weights <- function(factors) {
-        result <- NULL
-
-        mapply(function(method, factor) {
-            result[[method]] <<- factor
-        }, methods, factors)
-
-        result
     }
 
     # Compute the target rank of the reference genes when applying the weights.
     target_rank <- function(factors) {
-        data <- ranking(analysis, weights(factors))
+        data <- ranking(analysis, as.list(factors))
 
         result <- data[gene %chin% reference_gene_ids, if (target == "min") {
             min(rank)
@@ -91,10 +83,10 @@ optimal_weights <- function(analysis, methods, reference_gene_ids,
         }
     }
 
-    factors <- stats::optim(
-        rep(0.0, length(methods)),
-        target_rank
-    )$par
+    initial_factors <- rep(1.0, length(methods))
+    names(initial_factors) <- methods
 
-    weights(factors / max(abs(factors)))
+    optimal_factors <- stats::optim(initial_factors, target_rank)$par
+
+    as.list(optimal_factors / max(abs(optimal_factors)))
 }

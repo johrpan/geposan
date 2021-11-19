@@ -9,7 +9,8 @@ preset(
     "correlation_positions", "neural", "neural_positions", "proximity"),
   species_ids = NULL,
   gene_ids = NULL,
-  reference_gene_ids = NULL
+  reference_gene_ids = NULL,
+  optimization_target = "mean_rank"
 )
 }
 \arguments{
@@ -20,6 +21,9 @@ preset(
 \item{gene_ids}{IDs of genes to screen.}
 
 \item{reference_gene_ids}{IDs of reference genes to compare to.}
+
+\item{optimization_target}{Parameter of the reference genes that the ranking
+should be optimized for.}
 }
 \value{
 The preset to use with \code{\link[=analyze]{analyze()}}.
@@ -46,5 +50,12 @@ telomere across species.
 \item \code{neural_positions} Assessment by neural network trained using absolute
 position data.
 \item \code{proximity} Mean proximity to telomeres.
+}
+
+Available optimization targets are:
+\itemize{
+\item \code{mean} Mean rank of the reference genes.
+\item \code{max} First rank of the reference genes.
+\item \code{min} Last rank of the reference genes.
 }
 }

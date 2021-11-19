@@ -21,10 +21,18 @@
 #'    position data.
 #'  - `proximity` Mean proximity to telomeres.
 #'
+#' Available optimization targets are:
+#'
+#'  - `mean` Mean rank of the reference genes.
+#'  - `max` First rank of the reference genes.
+#'  - `min` Last rank of the reference genes.
+#'
 #' @param methods Methods to apply.
 #' @param species_ids IDs of species to include.
 #' @param gene_ids IDs of genes to screen.
 #' @param reference_gene_ids IDs of reference genes to compare to.
+#' @param optimization_target Parameter of the reference genes that the ranking
+#'   should be optimized for.
 #'
 #' @return The preset to use with [analyze()].
 #'
@@ -40,7 +48,8 @@ preset <- function(methods = c(
                    ),
                    species_ids = NULL,
                    gene_ids = NULL,
-                   reference_gene_ids = NULL) {
+                   reference_gene_ids = NULL,
+                   optimization_target = "mean_rank") {
     # Count included species per gene.
     genes_n_species <- geposan::distances[
         species %chin% species_ids,
@@ -61,7 +70,8 @@ preset <- function(methods = c(
             methods = sort(methods),
             species_ids = sort(species_ids),
             gene_ids = sort(gene_ids_filtered),
-            reference_gene_ids = sort(reference_gene_ids)
+            reference_gene_ids = sort(reference_gene_ids),
+            optimization_target = optimization_target
         ),
         class = "geposan_preset"
     )
@@ -87,8 +97,13 @@ print.geposan_preset <- function(x, ...) {
     ))
 
     cat(sprintf(
-        "\n  Comparison data: %i reference genes\n",
+        "\n  Comparison data: %i reference genes",
         length(x$reference_gene_ids)
+    ))
+
+    cat(sprintf(
+        "\n  Optimization target: %s\n",
+        x$optimization_target
     ))
 
     invisible(x)

@@ -9,9 +9,8 @@
 #'   items:
 #'   \describe{
 #'     \item{`preset`}{The preset that was used.}
-#'     \item{`results`}{A [data.table] with one row for each gene identified by
-#'       it's ID (`gene` column). The additional columns contain the resulting
-#'       scores per method and are named after the method IDs.}
+#'     \item{`weights`}{The optimal weights for ranking the reference genes.}
+#'     \item{`ranking`}{The optimal ranking created using the weights.}
 #'   }
 #'
 #' @export
@@ -75,10 +74,25 @@ analyze <- function(preset, progress = NULL) {
             total_progress <- total_progress + 1 / method_count
         }
 
+        results <- structure(
+            results,
+            class = c("geposan_results", class(results))
+        )
+
+        weights <- optimal_weights(
+            results,
+            preset$methods,
+            preset$reference_gene_ids,
+            target = preset$optimization_target
+        )
+
+        ranking <- ranking(results, weights)
+
         structure(
             list(
                 preset = preset,
-                results = results
+                weights = weights,
+                ranking = ranking
             ),
             class = "geposan_analysis"
         )
