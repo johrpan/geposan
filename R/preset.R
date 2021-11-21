@@ -43,7 +43,6 @@ preset <- function(methods = c(
                        "correlation",
                        "correlation_positions",
                        "neural",
-                       "neural_positions",
                        "proximity"
                    ),
                    species_ids = NULL,
