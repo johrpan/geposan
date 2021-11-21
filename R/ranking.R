@@ -51,8 +51,8 @@ ranking <- function(analysis, weights) {
 #' @param analysis Results from [analyze()] or [ranking()].
 #' @param methods Methods to include in the score.
 #' @param reference_gene_ids IDs of the reference genes.
-#' @param target The optimization target. It may be one of "mean", "min" or
-#'   "max" and results in the respective rank being optimized.
+#' @param target The optimization target. It may be one of "mean", "median",
+#'   "min" or "max" and results in the respective rank being optimized.
 #'
 #' @returns Named list pairing method names with their optimal weights. This
 #'   can be used as an argument to [ranking()].
@@ -72,8 +72,10 @@ optimal_weights <- function(analysis, methods, reference_gene_ids,
             min(rank)
         } else if (target == "max") {
             max(rank)
-        } else {
+        } else if (target == "mean") {
             mean(rank)
+        } else {
+            median(rank)
         }]
 
         if (result > 0) {

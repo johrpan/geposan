@@ -24,6 +24,7 @@
 #' Available optimization targets are:
 #'
 #'  - `mean` Mean rank of the reference genes.
+#'  - `median` Median rank of the reference genes.
 #'  - `max` First rank of the reference genes.
 #'  - `min` Last rank of the reference genes.
 #'
