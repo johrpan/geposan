@@ -188,3 +188,54 @@ plot_boxplot <- function(ranking, gene_sets = NULL, labels = NULL) {
         type = "box"
     )
 }
+
+#' Show the distribution of scores across chromosomes.
+#'
+#' This function requires the package `plotly`.
+#'
+#' @param ranking The ranking to visualize.
+#'
+#' @seealso ranking()
+#'
+#' @export
+plot_chromosomes <- function(ranking) {
+    if (!requireNamespace("plotly", quietly = TRUE)) {
+        stop("Please install \"plotly\" to use this function.")
+    }
+
+    data <- merge(ranking, geposan::genes, by.x = "gene", by.y = "id")
+    data <- data[, .(score = mean(score)), by = "chromosome"]
+
+    # Get an orderable integer from a chromosome name.
+    chromosome_index <- function(chromosome) {
+        index <- suppressWarnings(as.integer(chromosome))
+
+        ifelse(
+            !is.na(index),
+            index,
+            ifelse(
+                chromosome == "X",
+                998,
+                999
+            )
+        )
+    }
+
+    data[, index := chromosome_index(chromosome)]
+    setorder(data, "index")
+
+    plotly::plot_ly(
+        data = data,
+        x = ~chromosome,
+        y = ~score,
+        type = "bar"
+    ) |>
+        plotly::layout(
+            xaxis = list(
+                title = "Chromosome",
+                categoryorder = "array",
+                categoryarray = ~chromosome
+            ),
+            yaxis = list(title = "Mean score")
+        )
+}
