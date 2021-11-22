@@ -8,6 +8,9 @@ neural <- function(preset, progress = NULL, seed = 49641) {
         set.seed(seed)
         gene_count <- length(gene_ids)
 
+        progress_buffer <- 0
+        progress_step <- 1 / (2 * length(reference_gene_ids) + 1)
+
         # Prefilter distances by species.
         distances <- geposan::distances[species %chin% species_ids]
 
@@ -146,6 +149,11 @@ neural <- function(preset, progress = NULL, seed = 49641) {
             data_matrix <- keras::normalize(data_matrix)
 
             data[gene %chin% gene_ids, score := predict(model, data_matrix)]
+
+            if (!is.null(progress)) {
+                progress_buffer <<- progress_buffer + progress_step
+                progress(progress_buffer)
+            }
         }
 
         # Apply the network to all non-training genes first.
