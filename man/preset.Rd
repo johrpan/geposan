@@ -6,7 +6,7 @@
 \usage{
 preset(
   methods = c("clusteriness", "clusteriness_positions", "correlation",
-    "correlation_positions", "neural", "neural_positions", "proximity"),
+    "correlation_positions", "neural", "proximity"),
   species_ids = NULL,
   gene_ids = NULL,
   reference_gene_ids = NULL,
@@ -55,6 +55,7 @@ position data.
 Available optimization targets are:
 \itemize{
 \item \code{mean} Mean rank of the reference genes.
+\item \code{median} Median rank of the reference genes.
 \item \code{max} First rank of the reference genes.
 \item \code{min} Last rank of the reference genes.
 }

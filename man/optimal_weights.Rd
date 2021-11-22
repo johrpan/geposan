@@ -13,8 +13,8 @@ optimal_weights(analysis, methods, reference_gene_ids, target = "mean")
 
 \item{reference_gene_ids}{IDs of the reference genes.}
 
-\item{target}{The optimization target. It may be one of "mean", "min" or
-"max" and results in the respective rank being optimized.}
+\item{target}{The optimization target. It may be one of "mean", "median",
+"min" or "max" and results in the respective rank being optimized.}
 }
 \value{
 Named list pairing method names with their optimal weights. This
