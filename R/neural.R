@@ -25,10 +25,7 @@ neural <- function(preset, progress = NULL, seed = 49641) {
         # Make a columns containing positions and distances for each
         # species.
         for (species_id in species_ids) {
-            species_data <- distances[
-                species == species_id,
-                .(gene, position, distance)
-            ]
+            species_data <- distances[species == species_id, .(gene, distance)]
 
             # Only include species with at least 25% known values. As
             # positions and distances always coexist, we don't loose any
@@ -46,26 +43,14 @@ neural <- function(preset, progress = NULL, seed = 49641) {
                 # However, this will of course lessen the significance of
                 # the results.
 
-                mean_position <- round(species_data[, mean(position)])
                 mean_distance <- round(species_data[, mean(distance)])
+                data[is.na(distance), `:=`(distance = mean_distance)]
 
-                data[is.na(distance), `:=`(
-                    position = mean_position,
-                    distance = mean_distance
-                )]
+                # Name the new column after the species.
+                setnames(data, "distance", species_id)
 
-                input_position <- sprintf("%s_position", species_id)
-                input_distance <- sprintf("%s_distance", species_id)
-
-                # Name the new columns after the species.
-                setnames(
-                    data,
-                    c("position", "distance"),
-                    c(input_position, input_distance)
-                )
-
-                # Add the input variables to the buffer.
-                input_vars <- c(input_vars, input_position, input_distance)
+                # Add the input variable to the buffer.
+                input_vars <- c(input_vars, species_id)
             }
         }
 

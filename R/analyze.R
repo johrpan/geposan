@@ -32,13 +32,7 @@ analyze <- function(preset, progress = NULL) {
     #  - `score` Score for the gene between 0.0 and 1.0.
     methods <- list(
         "clusteriness" = clusteriness,
-        "clusteriness_positions" = function(...) {
-            clusteriness(..., use_positions = TRUE)
-        },
         "correlation" = correlation,
-        "correlation_positions" = function(...) {
-            correlation(..., use_positions = TRUE)
-        },
         "neural" = neural,
         "proximity" = proximity
     )

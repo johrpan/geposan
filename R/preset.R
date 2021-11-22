@@ -40,9 +40,7 @@
 #' @export
 preset <- function(methods = c(
                        "clusteriness",
-                       "clusteriness_positions",
                        "correlation",
-                       "correlation_positions",
                        "neural",
                        "proximity"
                    ),

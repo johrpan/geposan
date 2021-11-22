@@ -1,14 +1,12 @@
 # Compute the mean correlation coefficient comparing gene distances with a set
 # of reference genes.
-correlation <- function(preset, use_positions = FALSE, progress = NULL) {
+correlation <- function(preset, progress = NULL) {
     species_ids <- preset$species_ids
     gene_ids <- preset$gene_ids
     reference_gene_ids <- preset$reference_gene_ids
 
     cached(
-        "correlation",
-        c(species_ids, gene_ids, reference_gene_ids, use_positions),
-        { # nolint
+        "correlation", c(species_ids, gene_ids, reference_gene_ids), {
             # Prefilter distances by species.
             distances <- geposan::distances[species %chin% species_ids]
 
@@ -20,17 +18,10 @@ correlation <- function(preset, use_positions = FALSE, progress = NULL) {
 
             # Make a column containing distance data for each species.
             for (species_id in species_ids) {
-                species_data <- if (use_positions) {
-                    setnames(distances[
-                        species == species_id,
-                        .(gene, position)
-                    ], "position", "distance")
-                } else {
-                    distances[
-                        species == species_id,
-                        .(gene, distance)
-                    ]
-                }
+                species_data <- distances[
+                    species == species_id,
+                    .(gene, distance)
+                ]
 
                 data <- merge(data, species_data, all.x = TRUE)
                 setnames(data, "distance", species_id)

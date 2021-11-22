@@ -36,11 +36,11 @@ clusteriness_priv <- function(data, height = 1000000) {
 }
 
 # Process genes clustering their distance to telomeres.
-clusteriness <- function(preset, use_positions = FALSE, progress = NULL) {
+clusteriness <- function(preset, progress = NULL) {
     species_ids <- preset$species_ids
     gene_ids <- preset$gene_ids
 
-    cached("clusteriness", c(species_ids, gene_ids, use_positions), {
+    cached("clusteriness", c(species_ids, gene_ids), {
         results <- data.table(gene = gene_ids)
 
         # Prefilter the input data by species.
@@ -54,12 +54,7 @@ clusteriness <- function(preset, use_positions = FALSE, progress = NULL) {
 
         # Perform the cluster analysis for one gene.
         compute <- function(gene_id) {
-            data <- if (use_positions) {
-                distances[gene_id, position]
-            } else {
-                distances[gene_id, distance]
-            }
-
+            data <- distances[gene_id, distance]
             score <- clusteriness_priv(data)
 
             if (!is.null(progress)) {
