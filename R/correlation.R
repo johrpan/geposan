@@ -76,6 +76,14 @@ correlation <- function(preset, progress = NULL) {
             ]
 
             results[, .(gene, score)]
+
+            structure(
+                list(
+                    results = results[, .(gene, score)],
+                    all_correlations = results
+                ),
+                class = "geposan_method_results"
+            )
         }
     )
 }

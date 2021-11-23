@@ -65,6 +65,14 @@ clusteriness <- function(preset, progress = NULL) {
             score
         }
 
-        results[, score := compute(gene), by = 1:nrow(results)]
+        structure(
+            list(
+                results = results[,
+                    score := compute(gene),
+                    by = gene
+                ]
+            ),
+            class = "geposan_method_results"
+        )
     })
 }

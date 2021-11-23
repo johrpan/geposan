@@ -120,7 +120,7 @@ neural <- function(preset, progress = NULL, seed = 49641) {
             colnames(training_matrix) <- NULL
             training_matrix <- keras::normalize(training_matrix)
 
-            keras::fit(
+            fit <- keras::fit(
                 model,
                 x = training_matrix,
                 y = training_data$score,
@@ -142,22 +142,40 @@ neural <- function(preset, progress = NULL, seed = 49641) {
                 progress_buffer <<- progress_buffer + progress_step
                 progress(progress_buffer)
             }
+
+            list(
+                training_gene_ids = training_gene_ids,
+                gene_ids = gene_ids,
+                model = model,
+                fit = fit
+            )
         }
 
         # Apply the network to all non-training genes first.
-        apply_network(
+        network <- apply_network(
             training_data$gene,
             gene_ids[!gene_ids %chin% training_data$gene]
         )
 
+        cross_networks <- NULL
+
         # Apply the network to the training genes leaving out the gene itself.
         for (training_gene_id in training_data$gene) {
-            apply_network(
+            cross_network <- apply_network(
                 training_data[gene != training_gene_id, gene],
                 training_gene_id
             )
+
+            cross_networks <- c(cross_networks, cross_network)
         }
 
-        data[, .(gene, score)]
+        structure(
+            list(
+                results = data[, .(gene, score)],
+                network = network,
+                cross_networks = cross_networks
+            ),
+            class = "geposan_method_results"
+        )
     })
 }

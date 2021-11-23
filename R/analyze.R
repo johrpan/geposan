@@ -52,7 +52,7 @@ analyze <- function(preset, progress = NULL) {
             method_results <- methods[[method_id]](
                 preset,
                 progress = method_progress
-            )
+            )$results
 
             setnames(method_results, "score", method_id)
 

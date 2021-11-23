@@ -24,6 +24,11 @@ proximity <- function(preset, progress = NULL) {
             progress(1.0)
         }
 
-        data[, .(gene, score)]
+        structure(
+            list(
+                results = data[, .(gene, score)]
+            ),
+            class = "geposan_method_results"
+        )
     })
 }
