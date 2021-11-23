@@ -5,7 +5,8 @@ neural <- function(preset, progress = NULL, seed = 49641) {
     reference_gene_ids <- preset$reference_gene_ids
 
     cached("neural", c(species_ids, gene_ids, reference_gene_ids), {
-        set.seed(seed)
+        tensorflow::set_random_seed(seed)
+
         gene_count <- length(gene_ids)
 
         progress_buffer <- 0

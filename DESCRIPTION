@@ -23,7 +23,8 @@ Depends:
 Imports:
     data.table,
     keras,
-    rlang
+    rlang,
+    tensorflow
 Suggests:
     biomaRt,
     plotly,
