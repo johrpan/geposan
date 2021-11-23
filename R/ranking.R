@@ -75,7 +75,7 @@ optimal_weights <- function(analysis, methods, reference_gene_ids,
         } else if (target == "mean") {
             mean(rank)
         } else {
-            median(rank)
+            stats::median(rank)
         }]
 
         if (result > 0) {

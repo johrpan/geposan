@@ -5,8 +5,7 @@
 \title{Create a new preset.}
 \usage{
 preset(
-  methods = c("clusteriness", "clusteriness_positions", "correlation",
-    "correlation_positions", "neural", "proximity"),
+  methods = c("clusteriness", "correlation", "neural", "proximity"),
   species_ids = NULL,
   gene_ids = NULL,
   reference_gene_ids = NULL,

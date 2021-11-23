@@ -133,7 +133,10 @@ neural <- function(preset, progress = NULL, seed = 49641) {
             colnames(data_matrix) <- NULL
             data_matrix <- keras::normalize(data_matrix)
 
-            data[gene %chin% gene_ids, score := predict(model, data_matrix)]
+            data[
+                gene %chin% gene_ids,
+                score := stats::predict(model, data_matrix)
+            ]
 
             if (!is.null(progress)) {
                 progress_buffer <<- progress_buffer + progress_step
