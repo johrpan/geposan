@@ -12,7 +12,7 @@ Description: Analyze genes based on their position across species. This package
     includes gene data from Ensembl. It provides multiple methods to use that
     data to find genes that score well in comparison with a set of reference
     genes.
-License: GPL (>= 3)
+License: AGPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
