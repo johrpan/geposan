@@ -11,14 +11,10 @@
 #'
 #'  - `clusteriness` How much the gene distances to the nearest telomere
 #'    cluster across species.
-#'  - `clusteriness_positions` The same as `clusteriness` but using absolute
-#'    gene positions instead of distances.
 #'  - `correlation` The mean correlation of gene distances to the nearest
 #'    telomere across species.
-#'  - `correlation_positions` Correlation using position data.
-#'  - `neural` Assessment by neural network trained using distances.
-#'  - `neural_positions` Assessment by neural network trained using absolute
-#'    position data.
+#'  - `neural` Assessment by neural network trained on the reference genes.
+#'  - `adjacency` Proximity to reference genes.
 #'  - `proximity` Mean proximity to telomeres.
 #'
 #' Available optimization targets are:
@@ -42,6 +38,7 @@ preset <- function(methods = c(
                        "clusteriness",
                        "correlation",
                        "neural",
+                       "adjacency",
                        "proximity"
                    ),
                    species_ids = NULL,

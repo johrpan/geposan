@@ -34,6 +34,7 @@ analyze <- function(preset, progress = NULL) {
         "clusteriness" = clusteriness,
         "correlation" = correlation,
         "neural" = neural,
+        "adjacency" = adjacency,
         "proximity" = proximity
     )
 
