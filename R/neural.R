@@ -212,7 +212,7 @@ neural <- function(preset, progress = NULL, seed = 49641, n_models = 5) {
 
                 # Store the details.
 
-                networks[[i]]$model <- model
+                networks[[i]]$model <- keras::serialize_model(model)
                 networks[[i]]$fit <- fit
 
                 if (!is.null(progress)) {
