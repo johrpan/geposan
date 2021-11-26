@@ -54,7 +54,8 @@ preset <- function(methods = c(
 
     # Filter out genes with less than 25% existing orthologs.
     gene_ids_filtered <- genes_n_species[
-        n_species >= 0.25 * length(species_ids),
+        gene %chin% gene_ids &
+            n_species >= 0.25 * length(species_ids),
         gene
     ]
 
