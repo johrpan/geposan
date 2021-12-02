@@ -4,62 +4,63 @@
 #'
 #' @param species_ids IDs of species to show in the plot.
 #' @param gene_sets A list of gene sets (containing vectors of gene IDs) that
-#'   will be highlighted in the plot.
-#' @param labels Labels for the gene sets. This is required if gene sets are
-#'   given and has to have the same length.
-#' @param use_positions Whether to display positions instead of distances.
+#'   will be highlighted in the plot. The names will be used as labels.
 #'
 #' @export
-plot_positions <- function(species_ids,
-                           gene_sets,
-                           labels,
-                           use_positions = FALSE) {
+plot_positions <- function(species_ids, gene_sets) {
     if (!requireNamespace("plotly", quietly = TRUE)) {
         stop("Please install \"plotly\" to use this function.")
     }
 
-    data <- merge(
-        geposan::distances[gene %chin% unlist(gene_sets) &
-            species %chin% species_ids],
-        geposan::genes[, .(id, name)],
-        by.x = "gene", by.y = "id"
-    )
+    # Prefilter data by species.
+    data <- geposan::distances[species %chin% species_ids]
 
-    if (use_positions) {
-        data[, value := position]
-    } else {
-        data[, value := distance]
-    }
+    sample_data <- data[sample(nrow(data), 1000)]
 
-    # Add labels for each gene set.
-    for (i in seq_along(gene_sets)) {
-        data[gene %chin% gene_sets[[i]], label := labels[i]]
-    }
-
+    # Prefilter species.
     species <- geposan::species[id %chin% species_ids]
 
-    yaxis_title <- if (use_positions) {
-        "Position [Bp]"
-    } else {
-        "Distance to telomeres [Bp]"
+    plot <- plotly::plot_ly(colors = "Set2") |>
+        plotly::add_markers(
+            data = sample_data,
+            x = ~species,
+            y = ~distance,
+            color = "All genes",
+            hoverinfo = "skip"
+        ) |>
+        plotly::layout(
+            xaxis = list(
+                title = "Species",
+                tickvals = species$id,
+                ticktext = species$name
+            ),
+            yaxis = list(title = "Distance to telomeres [Bp]")
+        )
+
+    if (length(gene_sets) > 0) {
+        # Include gene information which will be used for labeling
+        gene_set_data <- merge(
+            data[gene %chin% unlist(gene_sets)],
+            geposan::genes,
+            by.x = "gene",
+            by.y = "id"
+        )
+
+        for (gene_set_name in names(gene_sets)) {
+            gene_set <- gene_sets[[gene_set_name]]
+
+            plot <- plot |> plotly::add_markers(
+                data = gene_set_data[gene %chin% gene_set],
+                x = ~species,
+                y = ~distance,
+                text = ~name,
+                color = gene_set_name,
+                marker = list(size = 10, opacity = 0.66)
+            )
+        }
     }
 
-    plotly::plot_ly(
-        data = data,
-        x = ~species,
-        y = ~value,
-        color = ~label,
-        text = ~name,
-        type = "scatter",
-        mode = "markers"
-    ) |> plotly::layout(
-        xaxis = list(
-            title = "Species",
-            tickvals = species$id,
-            ticktext = species$name
-        ),
-        yaxis = list(title = yaxis_title)
-    )
+    plot
 }
 
 
@@ -84,10 +85,7 @@ plot_rankings <- function(rankings, gene_sets) {
 
     plot <- plotly::plot_ly(colors = "Set2") |>
         plotly::layout(
-            xaxis = list(
-                title = "Ranking",
-                tickvals = names(rankings)
-            ),
+            xaxis = list(tickvals = names(rankings)),
             yaxis = list(title = "Score")
         )
 
@@ -95,13 +93,6 @@ plot_rankings <- function(rankings, gene_sets) {
 
     for (ranking_name in names(rankings)) {
         ranking <- rankings[[ranking_name]]
-
-        data <- merge(
-            ranking,
-            geposan::genes,
-            by.x = "gene",
-            by.y = "id"
-        )
 
         plot <- plot |> plotly::add_trace(
             data = ranking,
@@ -115,18 +106,27 @@ plot_rankings <- function(rankings, gene_sets) {
             hoverinfo = "skip"
         )
 
-        for (gene_set_name in names(gene_sets)) {
-            gene_set <- gene_sets[[gene_set_name]]
-
-            plot <- plot |> plotly::add_markers(
-                data = data[gene %chin% gene_set],
-                x = ranking_name,
-                y = ~score,
-                text = ~name,
-                color = gene_set_name,
-                showlegend = is_first,
-                marker = list(size = 20, opacity = 0.66)
+        if (length(gene_sets) > 0) {
+            gene_set_data <- merge(
+                ranking[gene %chin% unlist(gene_sets)],
+                geposan::genes,
+                by.x = "gene",
+                by.y = "id"
             )
+
+            for (gene_set_name in names(gene_sets)) {
+                gene_set <- gene_sets[[gene_set_name]]
+
+                plot <- plot |> plotly::add_markers(
+                    data = gene_set_data[gene %chin% gene_set],
+                    x = ranking_name,
+                    y = ~score,
+                    text = ~name,
+                    color = gene_set_name,
+                    showlegend = is_first,
+                    marker = list(size = 20, opacity = 0.66)
+                )
+            }
         }
 
         is_first <- FALSE
@@ -141,32 +141,25 @@ plot_rankings <- function(rankings, gene_sets) {
 #' This function requires the package `plotly`.
 #'
 #' @param ranking The ranking to visualize.
-#' @param gene_sets A list of gene sets (containing vectors of gene IDs) that
-#'   will be highlighted in the plot.
-#' @param labels Labels for the gene sets. This is required if gene sets are
-#'   given and has to have the same length.
-#' @param max_rank The maximum rank of the highlighted genes. All genes that
-#'   are ranked lower will appear greyed out.
+#' @param gene_sets A named list of gene sets (containing vectors of gene IDs)
+#'   that will be highlighted in the plot. The names will be used in the legend.
+#' @param max_rank The maximum rank of included genes. All genes that are ranked
+#'   lower will appear greyed out.
 #'
 #' @seealso ranking()
 #'
 #' @export
-plot_scores <- function(ranking,
-                        gene_sets = NULL,
-                        labels = NULL,
-                        max_rank = NULL) {
+plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
     if (!requireNamespace("plotly", quietly = TRUE)) {
         stop("Please install \"plotly\" to use this function.")
     }
 
-    plot <- plotly::plot_ly() |>
-        plotly::add_trace(
+    plot <- plotly::plot_ly(colors = "Set2") |>
+        plotly::add_markers(
             data = ranking,
             x = ~rank,
             y = ~score,
             color = "All genes",
-            type = "scatter",
-            mode = "markers",
             hoverinfo = "skip"
         ) |>
         plotly::layout(
@@ -175,32 +168,26 @@ plot_scores <- function(ranking,
         )
 
     if (length(gene_sets) > 0) {
-        # Take out the genes to be highlighted.
-        gene_set_data <- ranking[gene %chin% unlist(gene_sets)]
-
-        # Add labels for each gene set.
-        for (i in seq_along(gene_sets)) {
-            gene_set_data[gene %chin% gene_sets[[i]], label := labels[i]]
-        }
-
         # Include gene information which will be used for labeling
         gene_set_data <- merge(
-            gene_set_data,
+            ranking[gene %chin% unlist(gene_sets)],
             geposan::genes,
             by.x = "gene",
             by.y = "id"
         )
 
-        plot <- plot |> plotly::add_trace(
-            data = gene_set_data,
-            x = ~rank,
-            y = ~score,
-            color = ~label,
-            text = ~name,
-            type = "scatter",
-            mode = "markers",
-            marker = list(size = 20)
-        )
+        for (gene_set_name in names(gene_sets)) {
+            gene_set <- gene_sets[[gene_set_name]]
+
+            plot <- plot |> plotly::add_markers(
+                data = gene_set_data[gene %chin% gene_set],
+                x = ~rank,
+                y = ~score,
+                text = ~name,
+                color = gene_set_name,
+                marker = list(size = 20, opacity = 0.66)
+            )
+        }
     }
 
 
@@ -231,35 +218,45 @@ plot_scores <- function(ranking,
 #' This function requires the package `plotly`.
 #'
 #' @param ranking The ranking to visualize.
-#' @param gene_sets A list of gene sets (containing vectors of gene IDs) that
-#'   will be shown as separate boxes.
-#' @param labels Labels for the gene sets. This is required if gene sets are
-#'   given and has to have the same length.
+#' @param gene_sets A named list of gene sets (containing vectors of gene IDs)
+#'   that will be shown as separate boxes. The names will be used as labels.
 #'
 #' @seealso ranking()
 #'
 #' @export
-plot_boxplot <- function(ranking, gene_sets = NULL, labels = NULL) {
+plot_boxplot <- function(ranking, gene_sets = NULL) {
     if (!requireNamespace("plotly", quietly = TRUE)) {
         stop("Please install \"plotly\" to use this function.")
     }
 
-    data <- copy(ranking)
+    plot <- plotly::plot_ly(colors = "Set2") |>
+        plotly::add_boxplot(
+            data = ranking,
+            x = "All genes",
+            y = ~score,
+            color = "All genes",
+            showlegend = FALSE
+        ) |>
+        plotly::layout(
+            xaxis = list(tickvals = c("All genes", names(gene_sets))),
+            yaxis = list(title = "Score")
+        )
 
-    # Add labels for each gene set.
-    for (i in seq_along(gene_sets)) {
-        data[gene %chin% gene_sets[[i]], label := labels[i]]
+    if (length(gene_sets) > 0) {
+        for (gene_set_name in names(gene_sets)) {
+            gene_set <- gene_sets[[gene_set_name]]
+
+            plot <- plot |> plotly::add_boxplot(
+                data = ranking[gene %chin% gene_set],
+                x = gene_set_name,
+                y = ~score,
+                color = gene_set_name,
+                showlegend = FALSE
+            )
+        }
     }
 
-    # Label the other genes.
-    data[!gene %chin% unlist(gene_sets), label := "Other genes"]
-
-    plotly::plot_ly(
-        data = data,
-        y = ~score,
-        color = ~label,
-        type = "box"
-    )
+    plot
 }
 
 #' Show the distribution of scores across chromosomes.

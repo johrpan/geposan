@@ -4,19 +4,16 @@
 \alias{plot_scores}
 \title{Plot a ranking as a scatter plot of scores.}
 \usage{
-plot_scores(ranking, gene_sets = NULL, labels = NULL, max_rank = NULL)
+plot_scores(ranking, gene_sets = NULL, max_rank = NULL)
 }
 \arguments{
 \item{ranking}{The ranking to visualize.}
 
-\item{gene_sets}{A list of gene sets (containing vectors of gene IDs) that
-will be highlighted in the plot.}
+\item{gene_sets}{A named list of gene sets (containing vectors of gene IDs)
+that will be highlighted in the plot. The names will be used in the legend.}
 
-\item{labels}{Labels for the gene sets. This is required if gene sets are
-given and has to have the same length.}
-
-\item{max_rank}{The maximum rank of the highlighted genes. All genes that
-are ranked lower will appear greyed out.}
+\item{max_rank}{The maximum rank of included genes. All genes that are ranked
+lower will appear greyed out.}
 }
 \description{
 This function requires the package \code{plotly}.

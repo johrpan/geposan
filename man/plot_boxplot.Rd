@@ -4,16 +4,13 @@
 \alias{plot_boxplot}
 \title{Visualize a ranking by comparing gene sets in a boxplot.}
 \usage{
-plot_boxplot(ranking, gene_sets = NULL, labels = NULL)
+plot_boxplot(ranking, gene_sets = NULL)
 }
 \arguments{
 \item{ranking}{The ranking to visualize.}
 
-\item{gene_sets}{A list of gene sets (containing vectors of gene IDs) that
-will be shown as separate boxes.}
-
-\item{labels}{Labels for the gene sets. This is required if gene sets are
-given and has to have the same length.}
+\item{gene_sets}{A named list of gene sets (containing vectors of gene IDs)
+that will be shown as separate boxes. The names will be used as labels.}
 }
 \description{
 This function requires the package \code{plotly}.

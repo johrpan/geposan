@@ -4,18 +4,13 @@
 \alias{plot_positions}
 \title{Plot gene positions.}
 \usage{
-plot_positions(species_ids, gene_sets, labels, use_positions = FALSE)
+plot_positions(species_ids, gene_sets)
 }
 \arguments{
 \item{species_ids}{IDs of species to show in the plot.}
 
 \item{gene_sets}{A list of gene sets (containing vectors of gene IDs) that
-will be highlighted in the plot.}
-
-\item{labels}{Labels for the gene sets. This is required if gene sets are
-given and has to have the same length.}
-
-\item{use_positions}{Whether to display positions instead of distances.}
+will be highlighted in the plot. The names will be used as labels.}
 }
 \description{
 This function requires the package \code{plotly}.
