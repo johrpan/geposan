@@ -5,7 +5,7 @@
 \title{Create a new preset.}
 \usage{
 preset(
-  methods = c("clusteriness", "correlation", "neural", "proximity"),
+  methods = c("clusteriness", "correlation", "neural", "adjacency", "proximity"),
   species_ids = NULL,
   gene_ids = NULL,
   reference_gene_ids = NULL,
@@ -40,14 +40,10 @@ Available methods are:
 \itemize{
 \item \code{clusteriness} How much the gene distances to the nearest telomere
 cluster across species.
-\item \code{clusteriness_positions} The same as \code{clusteriness} but using absolute
-gene positions instead of distances.
 \item \code{correlation} The mean correlation of gene distances to the nearest
 telomere across species.
-\item \code{correlation_positions} Correlation using position data.
-\item \code{neural} Assessment by neural network trained using distances.
-\item \code{neural_positions} Assessment by neural network trained using absolute
-position data.
+\item \code{neural} Assessment by neural network trained on the reference genes.
+\item \code{adjacency} Proximity to reference genes.
 \item \code{proximity} Mean proximity to telomeres.
 }
 

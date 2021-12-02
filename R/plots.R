@@ -63,6 +63,79 @@ plot_positions <- function(species_ids,
 }
 
 
+#' Plot a side-by-side comparison of multiple rankings.
+#'
+#' Each ranking's scores will be shown as a vertical violin plot without any
+#' additional markings. The gene sets will be shown as markers on top of the
+#' density visualization.
+#'
+#' This function requires the package `plotly`.
+#'
+#' @param rankings A named list of rankings to display. The names will be shown
+#'   as labels in the plot.
+#' @param gene_sets A named list of vectors of gene IDs to highlight. The names
+#'   will be used to distinguish the sets and in the legend.
+#'
+#' @export
+plot_rankings <- function(rankings, gene_sets) {
+    if (!requireNamespace("plotly", quietly = TRUE)) {
+        stop("Please install \"plotly\" to use this function.")
+    }
+
+    plot <- plotly::plot_ly(colors = "Set2") |>
+        plotly::layout(
+            xaxis = list(
+                title = "Ranking",
+                tickvals = names(rankings)
+            ),
+            yaxis = list(title = "Score")
+        )
+
+    is_first <- TRUE
+
+    for (ranking_name in names(rankings)) {
+        ranking <- rankings[[ranking_name]]
+
+        data <- merge(
+            ranking,
+            geposan::genes,
+            by.x = "gene",
+            by.y = "id"
+        )
+
+        plot <- plot |> plotly::add_trace(
+            data = ranking,
+            x = ranking_name,
+            y = ~score,
+            color = "All genes",
+            type = "violin",
+            spanmode = "hard",
+            points = FALSE,
+            showlegend = is_first,
+            hoverinfo = "skip"
+        )
+
+        for (gene_set_name in names(gene_sets)) {
+            gene_set <- gene_sets[[gene_set_name]]
+
+            plot <- plot |> plotly::add_markers(
+                data = data[gene %chin% gene_set],
+                x = ranking_name,
+                y = ~score,
+                text = ~name,
+                color = gene_set_name,
+                showlegend = is_first,
+                marker = list(size = 20, opacity = 0.66)
+            )
+        }
+
+        is_first <- FALSE
+    }
+
+    plot
+}
+
+
 #' Plot a ranking as a scatter plot of scores.
 #'
 #' This function requires the package `plotly`.
