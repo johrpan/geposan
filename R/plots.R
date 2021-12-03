@@ -15,26 +15,28 @@ plot_positions <- function(species_ids, gene_sets) {
     # Prefilter data by species.
     data <- geposan::distances[species %chin% species_ids]
 
-    sample_data <- data[sample(nrow(data), 1000)]
+    species_max_distance <- data[,
+        .(max_distance = max(distance)),
+        by = species
+    ]
 
     # Prefilter species.
     species <- geposan::species[id %chin% species_ids]
 
     plot <- plotly::plot_ly(colors = "Set2") |>
-        plotly::add_markers(
-            data = sample_data,
-            x = ~species,
-            y = ~distance,
-            color = "All genes",
-            hoverinfo = "skip"
-        ) |>
         plotly::layout(
             xaxis = list(
                 title = "Species",
                 tickvals = species$id,
                 ticktext = species$name
             ),
-            yaxis = list(title = "Distance to telomeres [Bp]")
+            yaxis = list(title = "Distance to telomeres [Bp]"),
+            bargap = 0.9
+        ) |> plotly::add_bars(
+            data = species_max_distance,
+            x = ~species,
+            y = ~max_distance,
+            color = "All genes"
         )
 
     if (length(gene_sets) > 0) {
