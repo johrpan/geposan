@@ -27,6 +27,7 @@ Imports:
     tensorflow
 Suggests:
     biomaRt,
+    httr,
     plotly,
     rlog,
     stringr,
