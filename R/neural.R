@@ -6,7 +6,7 @@
 #   training data and validated using this set. For non-training genes, the
 #   final score will be the mean of the result of applying the different
 #   models.
-neural <- function(preset, progress = NULL, seed = 49641, n_models = 5) {
+neural <- function(preset, progress = NULL, seed = 751833, n_models = 5) {
     species_ids <- preset$species_ids
     gene_ids <- preset$gene_ids
     reference_gene_ids <- preset$reference_gene_ids
@@ -175,7 +175,10 @@ neural <- function(preset, progress = NULL, seed = 49641, n_models = 5) {
                         units = 1,
                         activation = "sigmoid"
                     ) |>
-                    keras::compile(loss = "binary_crossentropy")
+                    keras::compile(
+                        loss = keras::loss_binary_crossentropy(),
+                        optimizer = keras::optimizer_adam()
+                    )
 
                 # Train the model.
 
