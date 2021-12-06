@@ -156,13 +156,17 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
         stop("Please install \"plotly\" to use this function.")
     }
 
+    # To speed up rendering, don't show every single gene.
+    sample_ranking <- ranking[seq(1, nrow(ranking), 5)]
+
     plot <- plotly::plot_ly(colors = "Set2") |>
-        plotly::add_markers(
-            data = ranking,
+        plotly::add_lines(
+            data = sample_ranking,
             x = ~rank,
             y = ~score,
             color = "All genes",
-            hoverinfo = "skip"
+            hoverinfo = "skip",
+            line = list(width = 4)
         ) |>
         plotly::layout(
             xaxis = list(title = "Rank"),
