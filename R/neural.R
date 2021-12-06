@@ -197,7 +197,7 @@ neural <- function(preset, progress = NULL, seed = 751833, n_models = 5) {
                         x_val = validation_matrix,
                         y_val = validation_data$score
                     ),
-                    epochs = 300,
+                    epochs = 500,
                     verbose = FALSE
                 )
 
