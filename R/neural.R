@@ -176,7 +176,7 @@ neural <- function(preset, progress = NULL, seed = 751833, n_models = 5) {
                         activation = "sigmoid"
                     ) |>
                     keras::compile(
-                        loss = keras::loss_binary_crossentropy(),
+                        loss = keras::loss_mean_absolute_error(),
                         optimizer = keras::optimizer_adam()
                     )
 
