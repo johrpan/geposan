@@ -2,6 +2,7 @@
 
 S3method(print,geposan_comparison)
 S3method(print,geposan_preset)
+S3method(print,geposan_validation)
 export(analyze)
 export(compare)
 export(optimal_weights)
