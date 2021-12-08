@@ -5,7 +5,13 @@
 # further analysis. Clusters are then ranked based on their size in relation
 # to the number of values. The return value is a final score between zero and
 # one. Lower ranking clusters contribute less to this score.
-clusteriness_priv <- function(data, height = 1000000) {
+#
+# @param data The values that should be scored.
+# @param height The maximum span of values considered to be in one cluster.
+# @param weight The weight that will be given to the next largest cluster in
+#   relation to the previous one. For example, if `weight` is 0.7 (the default),
+#   the first cluster will weigh 1.0, the second 0.7, the third 0.49 etc.
+clusteriness_priv <- function(data, height = 1000000, weight = 0.7) {
     n <- length(data)
 
     # Return a score of 0.0 if there is just one or no value at all.
@@ -28,7 +34,7 @@ clusteriness_priv <- function(data, height = 1000000) {
 
         if (cluster_size >= 2) {
             cluster_score <- cluster_size / n
-            score <- score + cluster_score / i
+            score <- score + weight ^ (i - 1) * cluster_score
         }
     }
 
