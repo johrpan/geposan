@@ -11,7 +11,7 @@ adjacency <- function(preset, progress = NULL) {
     cached("adjacency", c(species_ids, gene_ids, reference_gene_ids), {
         # Get the virtual distance value with the highest density.
         compute_densest_distance <- function(distances) {
-            if (length(distances <= 2)) {
+            if (length(distances) <= 2) {
                 mean(distances)
             } else {
                 d <- stats::density(distances)
