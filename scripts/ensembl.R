@@ -333,7 +333,6 @@ human_data[, chromosome_length := max(end_position), by = chromosome_name]
 distances <- human_data[, .(
     species = "hsapiens",
     gene = ensembl_gene_id,
-    position = start_position,
     distance = pmin(
         start_position,
         chromosome_length - end_position
@@ -405,7 +404,6 @@ for (species_id in species[!id == "hsapiens", id]) {
     species_distances <- species_distances[, .(
         species = species_id,
         gene = hsapiens_homolog_ensembl_gene,
-        position = start_position,
         distance = pmin(
             start_position,
             chromosome_length - end_position

@@ -5,11 +5,10 @@
 \alias{distances}
 \title{Information on gene positions across species.}
 \format{
-A \link{data.table} with 1506182 rows and 4 variables:
+A \link{data.table} with the following columns:
 \describe{
 \item{species}{Species ID}
 \item{gene}{Gene ID}
-\item{position}{Gene start position}
 \item{distance}{Distance to nearest telomere}
 }
 }

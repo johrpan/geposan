@@ -5,7 +5,7 @@
 \alias{genes}
 \title{Information on human genes within the Ensembl database.}
 \format{
-A \link{data.table} with 60568 rows and 3 variables:
+A \link{data.table} with the following columns:
 \describe{
 \item{id}{Ensembl gene ID}
 \item{name}{The gene's HGNC name}
