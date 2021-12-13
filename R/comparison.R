@@ -18,7 +18,7 @@
 #'
 #' @export
 compare <- function(ranking, comparison_gene_ids) {
-    if (!"geposan_ranking" %chin% class(ranking)) {
+    if (!inherits(ranking, "geposan_ranking")) {
         stop("Invalid ranking. Use geposan::ranking().")
     }
 

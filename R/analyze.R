@@ -15,7 +15,7 @@
 #'
 #' @export
 analyze <- function(preset, progress = NULL) {
-    if (class(preset) != "geposan_preset") {
+    if (!inherits(preset, "geposan_preset")) {
         stop("Preset is invalid. Use geposan::preset() to create one.")
     }
 

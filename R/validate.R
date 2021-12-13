@@ -12,7 +12,7 @@
 #'
 #' @export
 validate <- function(analysis, progress = NULL) {
-    if (class(analysis) != "geposan_analysis") {
+    if (inherits(analysis, "geposan_analysis")) {
         stop("Analysis is invalid. Use geposan::analyze().")
     }
 
