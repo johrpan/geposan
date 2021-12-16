@@ -64,31 +64,41 @@ optimal_weights <- function(analysis, methods, reference_gene_ids,
         stop("Invalid analyis. Use geposan::analyze().")
     }
 
-    # Compute the target rank of the reference genes when applying the weights.
-    target_rank <- function(factors) {
-        data <- ranking(analysis, as.list(factors))
+    cached(
+        "optimization",
+        c(analysis$preset, methods, reference_gene_ids, target),
+        { # nolint
+            # Compute the target rank of the reference genes when applying the
+            # weights.
+            target_rank <- function(factors) {
+                data <- ranking(analysis, as.list(factors))
 
-        result <- data[gene %chin% reference_gene_ids, if (target == "min") {
-            min(rank)
-        } else if (target == "max") {
-            max(rank)
-        } else if (target == "mean") {
-            mean(rank)
-        } else {
-            stats::median(rank)
-        }]
+                result <- data[
+                    gene %chin% reference_gene_ids,
+                    if (target == "min") {
+                        min(rank)
+                    } else if (target == "max") {
+                        max(rank)
+                    } else if (target == "mean") {
+                        mean(rank)
+                    } else {
+                        stats::median(rank)
+                    }
+                ]
 
-        if (result > 0) {
-            result
-        } else {
-            Inf
+                if (result > 0) {
+                    result
+                } else {
+                    Inf
+                }
+            }
+
+            initial_factors <- rep(1.0, length(methods))
+            names(initial_factors) <- methods
+
+            optimal_factors <- stats::optim(initial_factors, target_rank)$par
+
+            as.list(optimal_factors / max(abs(optimal_factors)))
         }
-    }
-
-    initial_factors <- rep(1.0, length(methods))
-    names(initial_factors) <- methods
-
-    optimal_factors <- stats::optim(initial_factors, target_rank)$par
-
-    as.list(optimal_factors / max(abs(optimal_factors)))
+    )
 }
