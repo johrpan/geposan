@@ -24,6 +24,7 @@ Imports:
     data.table,
     keras,
     rlang,
+    progress,
     tensorflow
 Suggests:
     biomaRt,

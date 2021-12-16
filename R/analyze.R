@@ -1,16 +1,17 @@
-#' Analyze by applying the specified preset.
+#' Analyze genes based on position data.
 #'
 #' @param preset The preset to use which should be created using [preset()].
 #' @param progress A function to be called for progress information. The
 #'   function should accept a number between 0.0 and 1.0 for the current
-#'   progress.
+#'   progress. If no function is provided, a simple text progress bar will be
+#'   shown.
 #'
 #' @returns An object containing the results of the analysis with the following
 #'   items:
 #'   \describe{
 #'     \item{`preset`}{The preset that was used.}
-#'     \item{`weights`}{The optimal weights for ranking the reference genes.}
-#'     \item{`ranking`}{The optimal ranking created using the weights.}
+#'     \item{`scores`}{Table containing all scores for each gene.}
+#'     \item{`results`}{Results from the different methods including details.}
 #'   }
 #'
 #' @export
@@ -19,80 +20,69 @@ analyze <- function(preset, progress = NULL) {
         stop("Preset is invalid. Use geposan::preset() to create one.")
     }
 
-    # Available methods by ID.
-    #
-    # A method describes a way to perform a computation on gene distance data
-    # that results in a single score per gene. The function should accept the
-    # preset to apply (see [preset()]) and an optional progress function (that
-    # may be called with a number between 0.0 and 1.0) as its parameters.
-    #
-    # The function should return a [data.table] with the following columns:
-    #
-    #  - `gene` Gene ID of the processed gene.
-    #  - `score` Score for the gene between 0.0 and 1.0.
-    methods <- list(
-        "clusteriness" = clusteriness,
-        "correlation" = correlation,
-        "neural" = neural,
-        "adjacency" = adjacency,
-        "proximity" = proximity
-    )
+    if (is.null(progress)) {
+        progress_bar <- progress::progress_bar$new()
+        progress_bar$update(0.0)
 
-    analysis <- cached("analysis", preset, {
-        total_progress <- 0.0
-        method_count <- length(preset$methods)
-        results <- data.table(gene = preset$gene_ids)
-
-        for (method_id in preset$methods) {
-            method_progress <- if (!is.null(progress)) {
-                function(p) {
-                    progress(total_progress + p / method_count)
+        progress <- function(progress_value) {
+            if (!progress_bar$finished) {
+                progress_bar$update(progress_value)
+                if (progress_value >= 1.0) {
+                    progress_bar$terminate()
                 }
             }
-
-            method_results <- methods[[method_id]](
-                preset,
-                progress = method_progress
-            )$results
-
-            setnames(method_results, "score", method_id)
-
-            results <- merge(
-                results,
-                method_results,
-                by = "gene"
-            )
-
-            total_progress <- total_progress + 1 / method_count
         }
-
-        results <- structure(
-            results,
-            class = c("geposan_results", class(results))
-        )
-
-        weights <- optimal_weights(
-            results,
-            preset$methods,
-            preset$reference_gene_ids,
-            target = preset$optimization_target
-        )
-
-        ranking <- ranking(results, weights)
-
-        structure(
-            list(
-                preset = preset,
-                weights = weights,
-                ranking = ranking
-            ),
-            class = "geposan_analysis"
-        )
-    })
-
-    if (!is.null(progress)) {
-        progress(1.0)
     }
 
-    analysis
+    progress_buffer <- 0.0
+    method_count <- length(preset$methods)
+
+    method_progress <- function(progress_value) {
+        progress(progress_buffer + progress_value / method_count)
+    }
+
+    scores <- data.table(gene = preset$gene_id)
+    results <- list()
+
+    for (method in preset$methods) {
+        method_results <- method$func(preset, method_progress)
+
+        scores <- merge(scores, method_results$scores)
+        setnames(scores, "score", method$id)
+
+        results <- c(results, list(method_results))
+
+        progress_buffer <- progress_buffer + 1 / method_count
+        progress(progress_buffer)
+    }
+
+    structure(
+        list(
+            preset = preset,
+            scores = scores,
+            results = results
+        ),
+        class = "geposan_analysis"
+    )
+}
+
+#' Print an analysis object.
+#'
+#' @param x The analysis to print.
+#' @param ... Other parameters.
+#'
+#' @seealso [analyze()]
+#'
+#' @export
+print.geposan_analysis <- function(x, ...) {
+    cat("geposan analysis:\n\n")
+    print(x$preset)
+    cat("\n")
+
+    for (result in x$results) {
+        print(result)
+        cat("\n")
+    }
+
+    invisible(x)
 }

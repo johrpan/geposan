@@ -2,7 +2,7 @@
 % Please edit documentation in R/analyze.R
 \name{analyze}
 \alias{analyze}
-\title{Analyze by applying the specified preset.}
+\title{Analyze genes based on position data.}
 \usage{
 analyze(preset, progress = NULL)
 }
@@ -11,17 +11,18 @@ analyze(preset, progress = NULL)
 
 \item{progress}{A function to be called for progress information. The
 function should accept a number between 0.0 and 1.0 for the current
-progress.}
+progress. If no function is provided, a simple text progress bar will be
+shown.}
 }
 \value{
 An object containing the results of the analysis with the following
 items:
 \describe{
 \item{\code{preset}}{The preset that was used.}
-\item{\code{weights}}{The optimal weights for ranking the reference genes.}
-\item{\code{ranking}}{The optimal ranking created using the weights.}
+\item{\code{scores}}{Table containing all scores for each gene.}
+\item{\code{results}}{Results from the different methods including details.}
 }
 }
 \description{
-Analyze by applying the specified preset.
+Analyze genes based on position data.
 }

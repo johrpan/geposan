@@ -5,24 +5,20 @@
 \title{Create a new preset.}
 \usage{
 preset(
-  methods = c("clusteriness", "correlation", "neural", "adjacency", "proximity"),
-  species_ids = NULL,
-  gene_ids = NULL,
-  reference_gene_ids = NULL,
-  optimization_target = "mean_rank"
+  methods = all_methods(),
+  species_ids = geposan::species$id,
+  gene_ids = geposan::genes$id,
+  reference_gene_ids
 )
 }
 \arguments{
-\item{methods}{Methods to apply.}
+\item{methods}{List of methods to apply.}
 
 \item{species_ids}{IDs of species to include.}
 
 \item{gene_ids}{IDs of genes to screen.}
 
 \item{reference_gene_ids}{IDs of reference genes to compare to.}
-
-\item{optimization_target}{Parameter of the reference genes that the ranking
-should be optimized for.}
 }
 \value{
 The preset to use with \code{\link[=analyze]{analyze()}}.
@@ -33,25 +29,7 @@ analysis. Note that the genes to process should normally include the
 reference genes to be able to assess the results later. The genes will be
 filtered based on how many species have data for them. Genes which only have
 orthologs for less than 25\% of the input species will be excluded from the
-preset and the analyis.
-}
-\details{
-Available methods are:
-\itemize{
-\item \code{clusteriness} How much the gene distances to the nearest telomere
-cluster across species.
-\item \code{correlation} The mean correlation of gene distances to the nearest
-telomere across species.
-\item \code{neural} Assessment by neural network trained on the reference genes.
-\item \code{adjacency} Proximity to reference genes.
-\item \code{proximity} Mean proximity to telomeres.
-}
-
-Available optimization targets are:
-\itemize{
-\item \code{mean} Mean rank of the reference genes.
-\item \code{median} Median rank of the reference genes.
-\item \code{max} First rank of the reference genes.
-\item \code{min} Last rank of the reference genes.
-}
+preset and the analyis. See the different method functions for the available
+methods: \code{\link[=clustering]{clustering()}}, \code{\link[=correlation]{correlation()}}, \code{\link[=neural]{neural()}}, \code{\link[=adjacency]{adjacency()}} and
+\code{\link[=proximity]{proximity()}}.
 }

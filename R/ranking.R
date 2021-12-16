@@ -13,10 +13,10 @@
 #'
 #' @export
 ranking <- function(analysis, weights) {
-    if (inherits(analysis, "geposan_analysis")) {
-        ranking <- copy(analysis$ranking)
-    } else if (inherits(analysis, "geposan_results")) {
-        ranking <- copy(analysis)
+    ranking <- if (inherits(analysis, "geposan_analysis")) {
+        copy(analysis$scores)
+    } else if (inherits(analysis, "geposan_ranking")) {
+        copy(analysis)
     } else {
         stop("Invalid analyis. Use geposan::analyze().")
     }
@@ -39,7 +39,7 @@ ranking <- function(analysis, weights) {
 
     structure(
         ranking,
-        class = c("geposan_ranking", "geposan_results", class(ranking))
+        class = c("geposan_ranking", class(ranking))
     )
 }
 
@@ -60,7 +60,7 @@ ranking <- function(analysis, weights) {
 #' @export
 optimal_weights <- function(analysis, methods, reference_gene_ids,
                             target = "mean") {
-    if (!inherits(analysis, c("geposan_analysis", "geposan_results"))) {
+    if (!inherits(analysis, c("geposan_analysis", "geposan_ranking"))) {
         stop("Invalid analyis. Use geposan::analyze().")
     }
 

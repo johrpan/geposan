@@ -5,46 +5,22 @@
 #' reference genes to be able to assess the results later. The genes will be
 #' filtered based on how many species have data for them. Genes which only have
 #' orthologs for less than 25% of the input species will be excluded from the
-#' preset and the analyis.
+#' preset and the analyis. See the different method functions for the available
+#' methods: [clustering()], [correlation()], [neural()], [adjacency()] and
+#' [proximity()].
 #'
-#' Available methods are:
-#'
-#'  - `clusteriness` How much the gene distances to the nearest telomere
-#'    cluster across species.
-#'  - `correlation` The mean correlation of gene distances to the nearest
-#'    telomere across species.
-#'  - `neural` Assessment by neural network trained on the reference genes.
-#'  - `adjacency` Proximity to reference genes.
-#'  - `proximity` Mean proximity to telomeres.
-#'
-#' Available optimization targets are:
-#'
-#'  - `mean` Mean rank of the reference genes.
-#'  - `median` Median rank of the reference genes.
-#'  - `max` First rank of the reference genes.
-#'  - `min` Last rank of the reference genes.
-#'
-#' @param methods Methods to apply.
+#' @param methods List of methods to apply.
 #' @param species_ids IDs of species to include.
 #' @param gene_ids IDs of genes to screen.
 #' @param reference_gene_ids IDs of reference genes to compare to.
-#' @param optimization_target Parameter of the reference genes that the ranking
-#'   should be optimized for.
 #'
 #' @return The preset to use with [analyze()].
 #'
 #' @export
-preset <- function(methods = c(
-                       "clusteriness",
-                       "correlation",
-                       "neural",
-                       "adjacency",
-                       "proximity"
-                   ),
-                   species_ids = NULL,
-                   gene_ids = NULL,
-                   reference_gene_ids = NULL,
-                   optimization_target = "mean_rank") {
+preset <- function(methods = all_methods(),
+                   species_ids = geposan::species$id,
+                   gene_ids = geposan::genes$id,
+                   reference_gene_ids) {
     # Count included species per gene.
     genes_n_species <- geposan::distances[
         species %chin% species_ids,
@@ -63,11 +39,10 @@ preset <- function(methods = c(
     # for the object later.
     structure(
         list(
-            methods = sort(methods),
+            methods = methods,
             species_ids = sort(species_ids),
             gene_ids = sort(gene_ids_filtered),
-            reference_gene_ids = sort(reference_gene_ids),
-            optimization_target = optimization_target
+            reference_gene_ids = sort(reference_gene_ids)
         ),
         class = "geposan_preset"
     )
@@ -82,24 +57,19 @@ preset <- function(methods = c(
 #'
 #' @export
 print.geposan_preset <- function(x, ...) {
-    cat("geposan preset:")
-    cat("\n  Included methods: ")
-    cat(x$methods, sep = ", ")
-
     cat(sprintf(
-        "\n  Input data: %i species, %i genes",
+        paste0(
+            "geposan preset:",
+            "\n  Included methods: %s",
+            "\n  Number of species: %i",
+            "\n  Number of genes: %i",
+            "\n  Reference genes: %i",
+            "\n"
+        ),
+        paste(sapply(x$methods, function(m) m$id), collapse = ", "),
         length(x$species_ids),
-        length(x$gene_ids)
-    ))
-
-    cat(sprintf(
-        "\n  Comparison data: %i reference genes",
+        length(x$gene_ids),
         length(x$reference_gene_ids)
-    ))
-
-    cat(sprintf(
-        "\n  Optimization target: %s\n",
-        x$optimization_target
     ))
 
     invisible(x)
