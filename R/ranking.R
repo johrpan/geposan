@@ -8,8 +8,8 @@
 #'   methods that are contained within this list will be included.
 #'
 #' @returns A ranking object. The object extends the analysis result with
-#'   additional columns containing the `score` and the `rank` of each gene. It
-#'   will be ordered by rank.
+#'   additional columns containing the `score`, the `rank` and the `percentile`
+#'   for each gene. It will be ordered by rank.
 #'
 #' @export
 ranking <- function(analysis, weights) {
@@ -36,6 +36,7 @@ ranking <- function(analysis, weights) {
 
     setorder(ranking, -score)
     ranking[, rank := .I]
+    ranking[, percentile := 1 - rank / nrow(ranking)]
 
     structure(
         ranking,
