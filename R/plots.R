@@ -157,19 +157,23 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
     }
 
     # To speed up rendering, don't show every single gene.
-    sample_ranking <- ranking[seq(1, nrow(ranking), 5)]
+    n_ranks <- nrow(ranking)
+    sample_ranking <- ranking[seq(1, n_ranks, 5)]
 
     plot <- plotly::plot_ly(colors = "Set2") |>
         plotly::add_lines(
             data = sample_ranking,
-            x = ~rank,
+            x = ~percentile,
             y = ~score,
             color = "All genes",
             hoverinfo = "skip",
             line = list(width = 4)
         ) |>
         plotly::layout(
-            xaxis = list(title = "Rank"),
+            xaxis = list(
+                title = "Percentile",
+                tickformat = ".0%"
+            ),
             yaxis = list(title = "Score")
         )
 
@@ -187,7 +191,7 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
 
             plot <- plot |> plotly::add_markers(
                 data = gene_set_data[gene %chin% gene_set],
-                x = ~rank,
+                x = ~percentile,
                 y = ~score,
                 text = ~name,
                 color = gene_set_name,
@@ -207,8 +211,8 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
                     type = "rect",
                     fillcolor = "black",
                     opacity = 0.1,
-                    x0 = first_not_included_rank,
-                    x1 = last_rank,
+                    x0 = 1 - first_not_included_rank / n_ranks,
+                    x1 = 1 - last_rank / n_ranks,
                     y0 = 0.0,
                     y1 = 1.0
                 )
