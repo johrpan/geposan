@@ -193,8 +193,16 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
                 data = gene_set_data[gene %chin% gene_set],
                 x = ~percentile,
                 y = ~score,
-                text = ~name,
                 color = gene_set_name,
+                text = ~name,
+                customdata = ~rank,
+                hovertemplate = paste0(
+                    "<b>%{text}</b><br>",
+                    "Score: %{y:.3}<br>",
+                    "Rank: %{customdata}<br>",
+                    "Percentile: %{x:.2%}",
+                    "<extra></extra>"
+                ),
                 marker = list(size = 20, opacity = 0.66)
             )
         }
