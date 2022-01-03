@@ -2,9 +2,8 @@ library(data.table)
 
 rlog::log_info("Connecting to Ensembl API")
 
-# Object to access the Ensembl API. We use the US east mirror to circumvent
-# current issues with the main server being temporarily unreliable.
-ensembl <- biomaRt::useEnsembl("ensembl", host = "useast.ensembl.org")
+# Object to access the Ensembl API.
+ensembl <- biomaRt::useEnsembl("ensembl", version = 105)
 
 # Retrieve species information.
 
