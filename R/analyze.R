@@ -47,7 +47,7 @@ analyze <- function(preset, progress = NULL) {
     for (method in preset$methods) {
         method_results <- method$func(preset, method_progress)
 
-        scores <- merge(scores, method_results$scores)
+        scores <- merge(scores, method_results$scores, by = "gene")
         setnames(scores, "score", method$id)
 
         results <- c(results, list(method_results))
