@@ -12,7 +12,7 @@
 #'   relation to the previous one. For example, if `weight` is 0.7 (the
 #'   default), the first cluster will weigh 1.0, the second 0.7, the third 0.49
 #'   etc.
-clusteriness <- function(data, span = 1000000, weight = 0.7) {
+clusteriness <- function(data, span = 100000, weight = 0.7) {
     n <- length(data)
 
     # Return a score of 0.0 if there is just one or no value at all.
