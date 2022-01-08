@@ -323,23 +323,48 @@ genes <- human_data[, .(
 # Retrieve gene distance data across species.
 
 rlog::log_info("Retrieving distance data")
+distances <- data.table()
+
+#' Handle data for one species.
+handle_species <- function(species_id, species_data) {
+    chromosomes <- species_data[,
+        .(chromosome_length = max(end_position)),
+        by = chromosome_name
+    ]
+
+    # Store the number of chromosomes in the species table.
+    species[id == species_id, n_chromosomes := nrow(chromosomes)]
+
+    # Store the median chromosome length in the species table.
+    species[
+        id == species_id,
+        median_chromosome_length := chromosomes[, median(chromosome_length)]
+    ]
+
+    # Precompute the genes' distance to the nearest telomere.
+    species_distances <- species_data[
+        chromosomes,
+        .(
+            species = species_id,
+            gene = ensembl_gene_id,
+            distance = pmin(
+                start_position,
+                chromosome_length - end_position
+            )
+        ),
+        on = "chromosome_name"
+    ]
+
+    # Add species distances to the distances table.
+    distances <<- rbindlist(list(distances, species_distances))
+}
 
 # Handle the human first, as we already retrieved the data and don't need to
 # filter based on orthologies.
-
-human_data[, chromosome_length := max(end_position), by = chromosome_name]
-
-distances <- human_data[, .(
-    species = "hsapiens",
-    gene = ensembl_gene_id,
-    distance = pmin(
-        start_position,
-        chromosome_length - end_position
-    )
-)]
+handle_species("hsapiens", human_data)
 
 # Iterate through all other species and retrieve their distance data.
-for (species_id in species[!id == "hsapiens", id]) {
+for (species_id in species[86:nrow(species), id]) {
     rlog::log_info(sprintf("Loading species \"%s\"", species_id))
 
     dataset <- biomaRt::useDataset(
@@ -393,23 +418,14 @@ for (species_id in species[!id == "hsapiens", id]) {
         by = "hsapiens_homolog_ensembl_gene"
     )
 
-    # Precompute the genes' distance to the nearest telomere.
+    # Rename gene ID column to match the human data.
+    setnames(
+        species_distances,
+        "hsapiens_homolog_ensembl_gene",
+        "ensembl_gene_id"
+    )
 
-    species_distances[,
-        chromosome_length := max(end_position),
-        by = chromosome_name
-    ]
-
-    species_distances <- species_distances[, .(
-        species = species_id,
-        gene = hsapiens_homolog_ensembl_gene,
-        distance = pmin(
-            start_position,
-            chromosome_length - end_position
-        )
-    )]
-
-    distances <- rbindlist(list(distances, species_distances))
+    handle_species(species_id, species_distances)
 }
 
 # Save data in the appropriate place.
