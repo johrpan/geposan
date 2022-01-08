@@ -7,13 +7,15 @@ set of reference genes.
 
 ## Installation
 
-You can install the development version of geposan from
-[GitHub](https://github.com/) with:
+You can install the development version of geposan using:
 
 ```r
-# install.packages("devtools")
-devtools::install_github("johrpan/geposan")
+# install.packages("remotes")
+remotes::install_git("https://code.johrpan.de/johrpan/geposan.git")
 ```
+
+See [this page](https://remotes.r-lib.org/reference/install_git.html) for more
+information on this command.
 
 ## License
 
