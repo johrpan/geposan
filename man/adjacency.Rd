@@ -4,13 +4,15 @@
 \alias{adjacency}
 \title{Score genes based on their proximity to the reference genes.}
 \usage{
-adjacency()
+adjacency(estimate = densest)
+}
+\arguments{
+\item{estimate}{A function that will be used to summarize the distance
+values for each gene. See \code{\link[=densest]{densest()}} for the default implementation.}
 }
 \value{
 An object of class \code{geposan_method}.
 }
 \description{
-This method finds the distance value with the maximum density for each gene
-(i.e. the mode of its estimated distribution). Genes are scored by comparing
-those distance values with the values of the reference genes.
+Score genes based on their proximity to the reference genes.
 }
