@@ -1,31 +1,7 @@
-#' Find the densest value in the data.
-#'
-#' This function assumes that data represents a continuous variable and finds
-#' a single value with the highest estimated density. This can be used to
-#' estimate the mode of the data. If there is only one value that value is
-#' returned. If multiple density maxima with the same density exist, their mean
-#' is returned.
-#'
-#' @param data The input data.
-#'
-#' @return The densest value of data.
-#'
-#' @export
-densest <- function(data) {
-    as.numeric(if (length(data) <= 0) {
-        NULL
-    } else if (length(data) == 1) {
-        data
-    } else {
-        density <- stats::density(data)
-        mean(density$x[density$y == max(density$y)])
-    })
-}
-
 #' Score genes based on their proximity to the reference genes.
 #'
 #' @param estimate A function that will be used to summarize the distance
-#'   values for each gene. See [densest()] for the default implementation.
+#'   values for each gene. By default, [median()] is used.
 #' @param combination A function that will be used to combine the different
 #'   distances to the reference genes. By default [min()] is used. That means
 #'   the distance to the nearest reference gene will be scored.
@@ -33,7 +9,7 @@ densest <- function(data) {
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-adjacency <- function(estimate = densest, combination = min) {
+adjacency <- function(estimate = stats::median, combination = min) {
     method(
         id = "adjacency",
         name = "Adjacency",

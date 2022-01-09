@@ -4,11 +4,11 @@
 \alias{adjacency}
 \title{Score genes based on their proximity to the reference genes.}
 \usage{
-adjacency(estimate = densest, combination = min)
+adjacency(estimate = stats::median, combination = min)
 }
 \arguments{
 \item{estimate}{A function that will be used to summarize the distance
-values for each gene. See \code{\link[=densest]{densest()}} for the default implementation.}
+values for each gene. By default, \code{\link[=median]{median()}} is used.}
 
 \item{combination}{A function that will be used to combine the different
 distances to the reference genes. By default \code{\link[=min]{min()}} is used. That means
