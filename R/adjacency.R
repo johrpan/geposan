@@ -26,11 +26,14 @@ densest <- function(data) {
 #'
 #' @param estimate A function that will be used to summarize the distance
 #'   values for each gene. See [densest()] for the default implementation.
+#' @param combination A function that will be used to combine the different
+#'   distances to the reference genes. By default [min()] is used. That means
+#'   the distance to the nearest reference gene will be scored.
 #'
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-adjacency <- function(estimate = densest) {
+adjacency <- function(estimate = densest, combination = min) {
     method(
         id = "adjacency",
         name = "Adjacency",
@@ -42,26 +45,32 @@ adjacency <- function(estimate = densest) {
 
             cached(
                 "adjacency",
-                c(species_ids, gene_ids, reference_gene_ids, estimate),
+                c(
+                    species_ids,
+                    gene_ids,
+                    reference_gene_ids,
+                    estimate,
+                    combination
+                ),
                 { # nolint
                     # Filter distances by species and gene and summarize each
                     # gene's distance values using the estimation function.
                     data <- geposan::distances[
                         species %chin% species_ids & gene %chin% gene_ids,
-                        .(distance = estimate(distance)),
+                        .(distance = as.numeric(estimate(distance))),
                         by = gene
                     ]
 
                     # Compute the absolute value of the difference between the
                     # estimated distances of each gene to the reference genes.
-                    compute_difference <- function(distance,
+                    compute_difference <- function(distance_value,
                                                    comparison_ids) {
-                        reference_distance <- data[
+                        differences <- data[
                             gene %chin% comparison_ids,
-                            mean(distance)
+                            .(difference = abs(distance_value - distance))
                         ]
 
-                        abs(distance - reference_distance)
+                        combination(differences$difference)
                     }
 
                     # Compute the differences to the reference genes.
@@ -70,7 +79,8 @@ adjacency <- function(estimate = densest) {
                         difference := compute_difference(
                             distance,
                             reference_gene_ids
-                        )
+                        ),
+                        by = gene
                     ]
 
                     progress(0.5)
