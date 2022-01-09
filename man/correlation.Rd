@@ -2,8 +2,7 @@
 % Please edit documentation in R/correlation.R
 \name{correlation}
 \alias{correlation}
-\title{Compute the mean correlation coefficient comparing gene distances with a set
-of reference genes.}
+\title{Score genes based on their correlation with the reference genes.}
 \usage{
 correlation()
 }
@@ -11,6 +10,5 @@ correlation()
 An object of class \code{geposan_method}.
 }
 \description{
-Compute the mean correlation coefficient comparing gene distances with a set
-of reference genes.
+Score genes based on their correlation with the reference genes.
 }
