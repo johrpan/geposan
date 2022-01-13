@@ -123,8 +123,15 @@ plot_rankings <- function(rankings, gene_sets) {
                     data = gene_set_data[gene %chin% gene_set],
                     x = ranking_name,
                     y = ~score,
-                    text = ~name,
                     color = gene_set_name,
+                    text = ~name,
+                    customdata = ~percentile,
+                    hovertemplate = paste0(
+                        "<b>%{text}</b><br>",
+                        "Score: %{y:.3}<br>",
+                        "Percentile: %{customdata:.2%}",
+                        "<extra></extra>"
+                    ),
                     showlegend = is_first,
                     marker = list(size = 20, opacity = 0.66)
                 )
