@@ -35,11 +35,35 @@ preset <- function(reference_gene_ids,
         gene
     ]
 
+    reference_gene_ids_excluded <- reference_gene_ids[
+        !reference_gene_ids %chin% gene_ids_filtered
+    ]
+
+    if (length(reference_gene_ids_excluded > 0)) {
+        warning(paste0(
+            "The following reference gene IDs are excluded from the preset ",
+            "because they don't have enough data: ",
+            paste(reference_gene_ids_excluded, collapse = ", ")
+        ))
+    }
+
+    reference_gene_ids_included <- reference_gene_ids[
+        reference_gene_ids %chin% gene_ids_filtered
+    ]
+
+    if (length(reference_gene_ids_included) < 1) {
+        stop(paste0(
+            "There has to be at least one reference gene for the preset to be ",
+            "valid. Please note that some methods may require more reference ",
+            "genes."
+        ))
+    }
+
     # The included data gets sorted to be able to produce predictable hashes
     # for the object later.
     structure(
         list(
-            reference_gene_ids = sort(reference_gene_ids),
+            reference_gene_ids = sort(reference_gene_ids_included),
             methods = methods,
             species_ids = sort(species_ids),
             gene_ids = sort(gene_ids_filtered)
