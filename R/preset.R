@@ -9,18 +9,18 @@
 #' methods: [clustering()], [correlation()], [neural()], [adjacency()] and
 #' [proximity()].
 #'
+#' @param reference_gene_ids IDs of reference genes to compare to.
 #' @param methods List of methods to apply.
 #' @param species_ids IDs of species to include.
 #' @param gene_ids IDs of genes to screen.
-#' @param reference_gene_ids IDs of reference genes to compare to.
 #'
 #' @return The preset to use with [analyze()].
 #'
 #' @export
-preset <- function(methods = all_methods(),
+preset <- function(reference_gene_ids,
+                   methods = all_methods(),
                    species_ids = geposan::species$id,
-                   gene_ids = geposan::genes$id,
-                   reference_gene_ids) {
+                   gene_ids = geposan::genes$id) {
     # Count included species per gene.
     genes_n_species <- geposan::distances[
         species %chin% species_ids,
@@ -39,10 +39,10 @@ preset <- function(methods = all_methods(),
     # for the object later.
     structure(
         list(
+            reference_gene_ids = sort(reference_gene_ids),
             methods = methods,
             species_ids = sort(species_ids),
-            gene_ids = sort(gene_ids_filtered),
-            reference_gene_ids = sort(reference_gene_ids)
+            gene_ids = sort(gene_ids_filtered)
         ),
         class = "geposan_preset"
     )
@@ -60,16 +60,16 @@ print.geposan_preset <- function(x, ...) {
     cat(sprintf(
         paste0(
             "geposan preset:",
+            "\n  Reference genes: %i",
             "\n  Included methods: %s",
             "\n  Number of species: %i",
             "\n  Number of genes: %i",
-            "\n  Reference genes: %i",
             "\n"
         ),
+        length(x$reference_gene_ids),
         paste(sapply(x$methods, function(m) m$id), collapse = ", "),
         length(x$species_ids),
-        length(x$gene_ids),
-        length(x$reference_gene_ids)
+        length(x$gene_ids)
     ))
 
     invisible(x)

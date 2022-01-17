@@ -5,20 +5,20 @@
 \title{Create a new preset.}
 \usage{
 preset(
+  reference_gene_ids,
   methods = all_methods(),
   species_ids = geposan::species$id,
-  gene_ids = geposan::genes$id,
-  reference_gene_ids
+  gene_ids = geposan::genes$id
 )
 }
 \arguments{
+\item{reference_gene_ids}{IDs of reference genes to compare to.}
+
 \item{methods}{List of methods to apply.}
 
 \item{species_ids}{IDs of species to include.}
 
 \item{gene_ids}{IDs of genes to screen.}
-
-\item{reference_gene_ids}{IDs of reference genes to compare to.}
 }
 \value{
 The preset to use with \code{\link[=analyze]{analyze()}}.
