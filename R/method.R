@@ -36,7 +36,8 @@ all_methods <- function() {
         clustering(),
         correlation(),
         neural(),
-        adjacency()
+        adjacency(),
+        species_adjacency()
     )
 }
 

@@ -4,13 +4,14 @@
 \alias{adjacency}
 \title{Score genes based on their proximity to the reference genes.}
 \usage{
-adjacency(estimate = densest, combination = min)
+adjacency(distance_estimate = densest, summarize = min)
 }
 \arguments{
-\item{estimate}{A function that will be used to summarize the distance
-values for each gene. See \code{\link[=densest]{densest()}} for the default implementation.}
+\item{distance_estimate}{A function that will be used to summarize the
+distance values for each gene. See \code{\link[=densest]{densest()}} for the default
+implementation.}
 
-\item{combination}{A function that will be used to combine the different
+\item{summarize}{A function that will be used to combine the different
 distances to the reference genes. By default \code{\link[=min]{min()}} is used. That means
 the distance to the nearest reference gene will be scored.}
 }
@@ -18,5 +19,10 @@ the distance to the nearest reference gene will be scored.}
 An object of class \code{geposan_method}.
 }
 \description{
-Score genes based on their proximity to the reference genes.
+In this case, the distance data that is available for one gene is first
+combined. The resulting value is compared to the reference genes and
+determines the gene's score in relation to other genes.
+}
+\seealso{
+\code{\link[=species_adjacency]{species_adjacency()}}
 }
