@@ -5,12 +5,12 @@
 #'
 #' @returns A comparison object with the following items:
 #'   \describe{
-#'     \item{`mean`}{The mean score of the genes.}
-#'     \item{`min`}{The lowest score of the genes.}
-#'     \item{`max`}{The highest score of the genes.}
+#'     \item{`quantiles`}{A `data.table` containing quantile values for the
+#'       score, rank and percentile of the comparison genes.
+#'     }
+#'     \item{`mean_score`}{The mean score of the genes.}
 #'     \item{`mean_rank`}{The mean rank of the genes.}
-#'     \item{`first_rank`}{The first rank of the genes.}
-#'     \item{`last_rank`}{The last rank of the genes.}
+#'     \item{`mean_percentile`}{The mean percentile of the genes.}
 #'     \item{`p_value`}{p-value for the null hypothesis that the comparison
 #'       genes do _not_ rank better than other genes. In other words: A low
 #'       p-value means that the comparison genes rank particularly high.}
@@ -24,6 +24,16 @@ compare <- function(ranking, comparison_gene_ids) {
 
     comparison_ranking <- ranking[gene %chin% comparison_gene_ids]
 
+    quantiles <- data.table(
+        quantile = c("0%", "25%", "50%", "75%", "100%"),
+        score = stats::quantile(comparison_ranking[, score]),
+        rank = stats::quantile(
+            comparison_ranking[, rank],
+            probs = seq(1, 0, -0.25)
+        ),
+        percentile = stats::quantile(comparison_ranking[, percentile])
+    )
+
     p_value <- stats::wilcox.test(
         x = comparison_ranking[, score],
         y = ranking[!gene %chin% comparison_gene_ids, score],
@@ -32,12 +42,10 @@ compare <- function(ranking, comparison_gene_ids) {
 
     structure(
         list(
-            mean = comparison_ranking[, mean(score)],
-            min = comparison_ranking[, min(score)],
-            max = comparison_ranking[, max(score)],
+            quantiles = quantiles,
+            mean_score = comparison_ranking[, mean(score)],
             mean_rank = comparison_ranking[, mean(rank)],
-            first_rank = comparison_ranking[, min(rank)],
-            last_rank = comparison_ranking[, max(rank)],
+            mean_percentile = comparison_ranking[, mean(percentile)],
             p_value = p_value
         ),
         class = "geposan_comparison"
@@ -53,24 +61,30 @@ compare <- function(ranking, comparison_gene_ids) {
 #'
 #' @export
 print.geposan_comparison <- function(x, ...) {
-    cat("geposan comparison:")
+    cat("geposan comparison:\n\n")
+
+    quantiles_formatted <- x$quantiles[, .(
+        "Quantile" = quantile,
+        "Score" = round(score, 3),
+        "Rank" = rank,
+        "Percentile" = paste0(
+            format(round(percentile * 100, 1), nsmall = 1),
+            "%"
+        )
+    )]
+
+    print(quantiles_formatted, row.names = FALSE)
+
     cat(sprintf(
-        paste(
-            "\n\n  Mean score: %.3f",
-            "\n  Min score: %.3f",
-            "\n  Max score: %.3f",
-            "\n\n  Mean rank: %.1f",
-            "\n  First rank: %i",
-            "\n  Last rank: %i",
-            "\n\n  p-value for better ranking: %.4f\n",
-            sep = ""
+        paste0(
+            "\n  Mean score: %.3f",
+            "\n  Mean rank: %.1f",
+            "\n  Mean percentile: %.1f%%",
+            "\n  p-value for better scores: %.4f\n"
         ),
-        x$mean,
-        x$min,
-        x$max,
+        x$mean_score,
         x$mean_rank,
-        x$first_rank,
-        x$last_rank,
+        x$mean_percentile * 100,
         x$p_value
     ))
 
