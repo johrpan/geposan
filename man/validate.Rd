@@ -2,21 +2,38 @@
 % Please edit documentation in R/validate.R
 \name{validate}
 \alias{validate}
-\title{Perform cross-validation for the analysis.}
+\title{Perform cross-validation for the ranking.}
 \usage{
-validate(analysis, progress = NULL)
+validate(ranking, reference_gene_ids, method_ids, progress = NULL)
 }
 \arguments{
-\item{analysis}{The analysis to validate.}
+\item{ranking}{The ranking to validate.}
+
+\item{reference_gene_ids}{The reference gene IDs whose ranking should be
+validated.}
+
+\item{method_ids}{IDs of the methods that were used.}
 
 \item{progress}{An optional progress function that should accept a single
 value between 0.0 and 1.0 for progress information.}
 }
 \value{
-An object containing the mean absolute error and the mean percent
-rank for the original analysis as well as the validation.
+A validation object with the following items:
+\describe{
+\item{\code{validation}}{A \code{data.table} containing percentiles of the
+comparison genes from the original ranking as well as their validation.
+}
+\item{\code{mean_score}}{The mean score of the genes.}
+\item{\code{mean_percentile_original}}{The mean percentile of the genes in
+the original ranking.
+}
+\item{\code{mean_percentile_validation}}{The mean percentile of the genes
+when optimizing without themselves.
+}
+\item{\code{mean_error}}{The mean absolute error.}
+}
 }
 \description{
-This function reoptimizes the analysis leaving out one of the original
+This function reoptimizes the ranking leaving out one of the original
 reference genes at a time.
 }
