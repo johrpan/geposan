@@ -4,7 +4,7 @@
 \alias{adjacency}
 \title{Score genes based on their proximity to the reference genes.}
 \usage{
-adjacency(distance_estimate = densest, summarize = min)
+adjacency(distance_estimate = densest, summarize = stats::median)
 }
 \arguments{
 \item{distance_estimate}{A function that will be used to summarize the
@@ -12,8 +12,7 @@ distance values for each gene. See \code{\link[=densest]{densest()}} for the def
 implementation.}
 
 \item{summarize}{A function that will be used to combine the different
-distances to the reference genes. By default \code{\link[=min]{min()}} is used. That means
-the distance to the nearest reference gene will be scored.}
+distances to the reference genes. By default \code{\link[stats:median]{stats::median()}} is used.}
 }
 \value{
 An object of class \code{geposan_method}.

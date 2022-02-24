@@ -4,7 +4,7 @@
 \alias{species_adjacency}
 \title{Score genes based on their adjacency to the reference genes within species.}
 \usage{
-species_adjacency(distance_estimate = min, summarize = stats::median)
+species_adjacency(distance_estimate = stats::median, summarize = stats::median)
 }
 \arguments{
 \item{distance_estimate}{Function for combining the distance differences

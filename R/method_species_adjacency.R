@@ -13,7 +13,7 @@
 #' @seealso [adjacency()]
 #'
 #' @export
-species_adjacency <- function(distance_estimate = min,
+species_adjacency <- function(distance_estimate = stats::median,
                               summarize = stats::median) {
     method(
         id = "species_adjacency",

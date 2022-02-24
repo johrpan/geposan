@@ -32,15 +32,14 @@ densest <- function(data) {
 #'   distance values for each gene. See [densest()] for the default
 #'   implementation.
 #' @param summarize A function that will be used to combine the different
-#'   distances to the reference genes. By default [min()] is used. That means
-#'   the distance to the nearest reference gene will be scored.
+#'   distances to the reference genes. By default [stats::median()] is used.
 #'
 #' @return An object of class `geposan_method`.
 #'
 #' @seealso [species_adjacency()]
 #'
 #' @export
-adjacency <- function(distance_estimate = densest, summarize = min) {
+adjacency <- function(distance_estimate = densest, summarize = stats::median) {
     method(
         id = "adjacency",
         name = "Adjacency",
