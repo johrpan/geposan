@@ -5,6 +5,8 @@
 #'   function should accept a number between 0.0 and 1.0 for the current
 #'   progress. If no function is provided, a simple text progress bar will be
 #'   shown.
+#' @param include_results Whether to include the detailed results. If this is
+#'   set to `FALSE`, only the `scores` are available.
 #'
 #' @returns An object containing the results of the analysis with the following
 #'   items:
@@ -15,7 +17,7 @@
 #'   }
 #'
 #' @export
-analyze <- function(preset, progress = NULL) {
+analyze <- function(preset, progress = NULL, include_results = TRUE) {
     if (!inherits(preset, "geposan_preset")) {
         stop("Preset is invalid. Use geposan::preset() to create one.")
     }
@@ -60,7 +62,7 @@ analyze <- function(preset, progress = NULL) {
         list(
             preset = preset,
             scores = scores,
-            results = results
+            results = if (include_results) results else NULL
         ),
         class = "geposan_analysis"
     )
