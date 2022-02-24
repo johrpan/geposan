@@ -4,7 +4,12 @@
 \alias{correlation}
 \title{Score genes based on their correlation with the reference genes.}
 \usage{
-correlation()
+correlation(summarize = stats::median)
+}
+\arguments{
+\item{summarize}{A function for combining the different correlation
+coefficients into one metric. By default, \code{\link[stats:median]{stats::median()}} is used. Other
+suggested options include \code{\link[=max]{max()}} and \code{\link[=mean]{mean()}}.}
 }
 \value{
 An object of class \code{geposan_method}.

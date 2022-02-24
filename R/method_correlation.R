@@ -1,9 +1,13 @@
 #' Score genes based on their correlation with the reference genes.
 #'
+#' @param summarize A function for combining the different correlation
+#'   coefficients into one metric. By default, [stats::median()] is used. Other
+#'   suggested options include [max()] and [mean()].
+#'
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-correlation <- function() {
+correlation <- function(summarize = stats::median) {
     method(
         id = "correlation",
         name = "Correlation",
@@ -15,7 +19,7 @@ correlation <- function() {
 
             cached(
                 "correlation",
-                c(species_ids, gene_ids, reference_gene_ids),
+                c(species_ids, gene_ids, reference_gene_ids, summarize),
                 { # nolint
                     # Prefilter distances by species.
                     distances <- geposan::distances[species %chin% species_ids]
@@ -65,9 +69,14 @@ correlation <- function() {
 
                     progress(0.66)
 
-                    # Find the highes correlation.
+                    # Combine the correlation coefficients.
                     results[,
-                        max_correlation := max(.SD, na.rm = TRUE),
+                        max_correlation := as.double(summarize(na.omit(
+                            # Convert the data.table subset into a
+                            # vector to get the correct na.omit
+                            # behavior.
+                            as.matrix(.SD)[1, ]
+                        ))),
                         .SDcols = reference_gene_ids,
                         by = gene
                     ]
