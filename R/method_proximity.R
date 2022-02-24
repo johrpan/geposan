@@ -1,12 +1,16 @@
-#' Score the mean distance of genes to the telomeres across species.
+#' Score the distance of genes to the telomeres across species.
 #'
 #' A score will be given to each gene such that 0.0 corresponds to the maximal
-#' mean distance across all genes and 1.0 corresponds to a distance of 0.
+#' distance across all genes and 1.0 corresponds to a distance of 0.
+#'
+#' @param summarize A function for combining the different proximities into one
+#'   metric. By default, [stats::median()] is used. Other suggested options
+#'   include [min()] and [mean()].
 #'
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-proximity <- function() {
+proximity <- function(summarize = stats::median) {
     method(
         id = "proximity",
         name = "Proximity",
@@ -23,15 +27,20 @@ proximity <- function() {
                 ]
 
                 # Compute the score as described above.
-                data <- data[, .(mean_distance = mean(distance)), by = "gene"]
-                max_distance <- data[, max(mean_distance)]
-                data[, score := 1 - mean_distance / max_distance]
+                data <- data[,
+                    .(combined_distance = as.double(summarize(distance))),
+                    by = "gene"
+                ]
+
+                # Normalize scores.
+                data[, score := 1 - combined_distance / max(combined_distance)]
 
                 progress(1.0)
 
                 result(
                     method = "proximity",
-                    scores = data[, .(gene, score)]
+                    scores = data[, .(gene, score)],
+                    details = list(data = data)
                 )
             })
         }
