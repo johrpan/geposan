@@ -7,7 +7,7 @@
 #' orthologs for less than 25% of the input species will be excluded from the
 #' preset and the analyis. See the different method functions for the available
 #' methods: [clustering()], [correlation()], [neural()], [adjacency()] and
-#' [proximity()].
+#' [species_adjacency()].
 #'
 #' @param reference_gene_ids IDs of reference genes to compare to.
 #' @param methods List of methods to apply.
