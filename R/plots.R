@@ -1,3 +1,17 @@
+#' Base color for the plots.
+#' @noRd
+base_color <- function() "#1964bf"
+
+#' Transparent version of the base color.
+#' @noRd
+base_color_transparent <- function() "#1964bf80"
+
+#' Color palette for gene sets.
+#' @noRd
+gene_set_color <- function(index) {
+    c("#FF7F00", "#4DAF4A", "#984EA3")[index]
+}
+
 #' Plot gene positions.
 #'
 #' This function requires the package `plotly`.
@@ -23,7 +37,7 @@ plot_positions <- function(species_ids, gene_sets) {
     # Prefilter species.
     species <- geposan::species[id %chin% species_ids]
 
-    plot <- plotly::plot_ly(colors = "Set2") |>
+    plot <- plotly::plot_ly() |>
         plotly::layout(
             xaxis = list(
                 title = "Species",
@@ -36,7 +50,8 @@ plot_positions <- function(species_ids, gene_sets) {
             data = species_max_distance,
             x = ~species,
             y = ~max_distance,
-            color = "All genes"
+            name = "All genes",
+            marker = list(color = base_color())
         )
 
     if (length(gene_sets) > 0) {
@@ -48,6 +63,8 @@ plot_positions <- function(species_ids, gene_sets) {
             by.y = "id"
         )
 
+        index <- 1
+
         for (gene_set_name in names(gene_sets)) {
             gene_set <- gene_sets[[gene_set_name]]
 
@@ -56,9 +73,14 @@ plot_positions <- function(species_ids, gene_sets) {
                 x = ~species,
                 y = ~distance,
                 text = ~name,
-                color = gene_set_name,
-                marker = list(size = 10, opacity = 0.66)
+                name = gene_set_name,
+                marker = list(
+                    size = 10,
+                    color = gene_set_color(index)
+                )
             )
+
+            index <- index + 1
         }
     }
 
@@ -85,7 +107,7 @@ plot_rankings <- function(rankings, gene_sets) {
         stop("Please install \"plotly\" to use this function.")
     }
 
-    plot <- plotly::plot_ly(colors = "Set2") |>
+    plot <- plotly::plot_ly() |>
         plotly::layout(
             xaxis = list(tickvals = names(rankings)),
             yaxis = list(title = "Score")
@@ -100,12 +122,14 @@ plot_rankings <- function(rankings, gene_sets) {
             data = ranking,
             x = ranking_name,
             y = ~score,
-            color = "All genes",
+            name = "All genes",
             type = "violin",
             spanmode = "hard",
             points = FALSE,
             showlegend = is_first,
-            hoverinfo = "skip"
+            hoverinfo = "skip",
+            line = list(color = base_color()),
+            fillcolor = base_color_transparent()
         )
 
         if (length(gene_sets) > 0) {
@@ -116,6 +140,8 @@ plot_rankings <- function(rankings, gene_sets) {
                 by.y = "id"
             )
 
+            index <- 1
+
             for (gene_set_name in names(gene_sets)) {
                 gene_set <- gene_sets[[gene_set_name]]
 
@@ -123,7 +149,7 @@ plot_rankings <- function(rankings, gene_sets) {
                     data = gene_set_data[gene %chin% gene_set],
                     x = ranking_name,
                     y = ~score,
-                    color = gene_set_name,
+                    name = gene_set_name,
                     text = ~name,
                     customdata = ~percentile,
                     hovertemplate = paste0(
@@ -133,8 +159,13 @@ plot_rankings <- function(rankings, gene_sets) {
                         "<extra></extra>"
                     ),
                     showlegend = is_first,
-                    marker = list(size = 20, opacity = 0.66)
+                    marker = list(
+                        size = 10,
+                        color = gene_set_color(index)
+                    )
                 )
+
+                index <- index + 1
             }
         }
 
@@ -167,14 +198,14 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
     n_ranks <- nrow(ranking)
     sample_ranking <- ranking[seq(1, n_ranks, 5)]
 
-    plot <- plotly::plot_ly(colors = "Set2") |>
+    plot <- plotly::plot_ly() |>
         plotly::add_lines(
             data = sample_ranking,
             x = ~percentile,
             y = ~score,
-            color = "All genes",
+            name = "All genes",
             hoverinfo = "skip",
-            line = list(width = 4)
+            line = list(width = 4, color = base_color())
         ) |>
         plotly::layout(
             xaxis = list(
@@ -193,6 +224,8 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
             by.y = "id"
         )
 
+        index <- 1
+
         for (gene_set_name in names(gene_sets)) {
             gene_set <- gene_sets[[gene_set_name]]
 
@@ -200,7 +233,7 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
                 data = gene_set_data[gene %chin% gene_set],
                 x = ~percentile,
                 y = ~score,
-                color = gene_set_name,
+                name = gene_set_name,
                 text = ~name,
                 customdata = ~rank,
                 hovertemplate = paste0(
@@ -210,8 +243,13 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
                     "Percentile: %{x:.2%}",
                     "<extra></extra>"
                 ),
-                marker = list(size = 20, opacity = 0.66)
+                marker = list(
+                    size = 10,
+                    color = gene_set_color(index)
+                )
             )
+
+            index <- index + 1
         }
     }
 
@@ -254,13 +292,14 @@ plot_boxplot <- function(ranking, gene_sets = NULL) {
         stop("Please install \"plotly\" to use this function.")
     }
 
-    plot <- plotly::plot_ly(colors = "Set2") |>
+    plot <- plotly::plot_ly() |>
         plotly::add_boxplot(
             data = ranking,
             x = "All genes",
             y = ~score,
-            color = "All genes",
-            showlegend = FALSE
+            name = "All genes",
+            showlegend = FALSE,
+            line = list(color = base_color())
         ) |>
         plotly::layout(
             xaxis = list(tickvals = c("All genes", names(gene_sets))),
@@ -268,6 +307,8 @@ plot_boxplot <- function(ranking, gene_sets = NULL) {
         )
 
     if (length(gene_sets) > 0) {
+        index <- 1
+
         for (gene_set_name in names(gene_sets)) {
             gene_set <- gene_sets[[gene_set_name]]
 
@@ -275,9 +316,12 @@ plot_boxplot <- function(ranking, gene_sets = NULL) {
                 data = ranking[gene %chin% gene_set],
                 x = gene_set_name,
                 y = ~score,
-                color = gene_set_name,
-                showlegend = FALSE
+                name = gene_set_name,
+                showlegend = FALSE,
+                line = list(color = gene_set_color(index))
             )
+
+            index <- index + 1
         }
     }
 
@@ -323,7 +367,8 @@ plot_chromosomes <- function(ranking) {
         data = data,
         x = ~chromosome,
         y = ~score,
-        type = "bar"
+        type = "bar",
+        marker = list(color = base_color())
     ) |>
         plotly::layout(
             xaxis = list(
