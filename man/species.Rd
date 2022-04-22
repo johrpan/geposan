@@ -9,6 +9,8 @@ A \link{data.table} with the following columns:
 \describe{
 \item{id}{Unique species ID}
 \item{name}{Human readable species name}
+\item{n_chromosomes}{Number of chromosomes}
+\item{median_chromosome_length}{Median length of chromosomes}
 }
 }
 \usage{

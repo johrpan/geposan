@@ -4,6 +4,8 @@
 #' \describe{
 #'   \item{id}{Unique species ID}
 #'   \item{name}{Human readable species name}
+#'   \item{n_chromosomes}{Number of chromosomes}
+#'   \item{median_chromosome_length}{Median length of chromosomes}
 #' }
 "species"
 
@@ -29,6 +31,9 @@
 #' \describe{
 #'   \item{species}{Species ID}
 #'   \item{gene}{Gene ID}
-#'   \item{distance}{Distance to nearest telomere}
+#'   \item{chromosome_name}{Chromosome name from the specified species}
+#'   \item{start_position}{Start position in base pairs}
+#'   \item{end_position}{End position in base pairs}
+#'   \item{distance}{Computed distance to nearest telomere}
 #' }
 "distances"
