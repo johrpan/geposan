@@ -71,7 +71,7 @@ correlation <- function(summarize = stats::median) {
 
                     # Combine the correlation coefficients.
                     results[,
-                        max_correlation := as.double(summarize(na.omit(
+                        max_correlation := as.double(summarize(stats::na.omit(
                             # Convert the data.table subset into a
                             # vector to get the correct na.omit
                             # behavior.

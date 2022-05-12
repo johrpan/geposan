@@ -81,7 +81,7 @@ species_adjacency <- function(distance_estimate = stats::median,
                             species == species_id &
                                 gene %chin% gene_ids,
                             combined_distance := as.numeric(
-                                distance_estimate(na.omit(
+                                distance_estimate(stats::na.omit(
                                     # Convert the data.table subset into a
                                     # vector to get the correct na.omit
                                     # behavior.
@@ -108,7 +108,9 @@ species_adjacency <- function(distance_estimate = stats::median,
                     data[
                         gene %chin% reference_gene_ids,
                         combined_distance := as.numeric(
-                            distance_estimate(na.omit(as.matrix(.SD)[1, ]))
+                            distance_estimate(stats::na.omit(
+                                as.matrix(.SD)[1, ])
+                            )
                         ),
                         .SDcols = reference_gene_ids,
                         by = list(species, gene)
@@ -118,7 +120,7 @@ species_adjacency <- function(distance_estimate = stats::median,
                     results <- data[,
                         .(
                             summarized_distances = as.numeric(
-                                summarize(na.omit(combined_distance))
+                                summarize(stats::na.omit(combined_distance))
                             )
                         ),
                         by = gene
