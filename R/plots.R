@@ -46,7 +46,8 @@ plot_positions <- function(species_ids, gene_sets) {
             ),
             yaxis = list(title = "Distance to telomeres [Bp]"),
             bargap = 0.9
-        ) |> plotly::add_bars(
+        ) |>
+        plotly::add_bars(
             data = species_max_distance,
             x = ~species,
             y = ~max_distance,
@@ -377,5 +378,43 @@ plot_chromosomes <- function(ranking) {
                 categoryarray = ~chromosome
             ),
             yaxis = list(title = "Mean score")
+        )
+}
+
+#' Plot scores in relation to chromosomal position of genes.
+#'
+#' @param ranking The ranking to visualize.
+#' @param chromosome_name The chromosome to visualize.
+#'
+#' @return A `plotly` figure.
+#' @seealso ranking()
+#'
+#' @export
+plot_scores_by_position <- function(ranking, chromosome_name) {
+    if (!requireNamespace("plotly", quietly = TRUE)) {
+        stop("Please install \"plotly\" to use this function.")
+    }
+
+    chromosome_name_ <- chromosome_name
+
+    data <- merge(
+        ranking,
+        geposan::distances[
+            species == "hsapiens" &
+                chromosome_name == chromosome_name_
+        ],
+        by = "gene"
+    )
+
+    plotly::plot_ly() |>
+        plotly::add_markers(
+            data = data,
+            x = ~start_position,
+            y = ~score,
+            hoverinfo = "skip"
+        ) |>
+        plotly::layout(
+            xaxis = list(title = "Position (Bp)"),
+            yaxis = list(title = "Score")
         )
 }
