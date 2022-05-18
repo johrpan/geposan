@@ -385,12 +385,16 @@ plot_chromosomes <- function(ranking) {
 #'
 #' @param ranking The ranking to visualize.
 #' @param chromosome_name The chromosome to visualize.
+#' @param gene_sets Named list of vectors of genes to highlight. The list names
+#'   will be used as labels.
 #'
 #' @return A `plotly` figure.
 #' @seealso ranking()
 #'
 #' @export
-plot_scores_by_position <- function(ranking, chromosome_name) {
+plot_scores_by_position <- function(ranking,
+                                    chromosome_name,
+                                    gene_sets = NULL) {
     if (!requireNamespace("plotly", quietly = TRUE)) {
         stop("Please install \"plotly\" to use this function.")
     }
@@ -406,11 +410,28 @@ plot_scores_by_position <- function(ranking, chromosome_name) {
         by = "gene"
     )
 
+    data[, `:=`(gene_set = "All genes", color = base_color())]
+
+    index <- 1
+    for (gene_set_name in names(gene_sets)) {
+        gene_set_genes <- gene_sets[[gene_set_name]]
+        data[
+            gene %chin% gene_set_genes,
+            `:=`(
+                gene_set = gene_set_name,
+                color = gene_set_color(index)
+            )
+        ]
+
+        index <- index + 1
+    }
+
     plotly::plot_ly() |>
         plotly::add_markers(
             data = data,
             x = ~start_position,
             y = ~score,
+            name = ~gene_set,
             hoverinfo = "skip"
         ) |>
         plotly::layout(
