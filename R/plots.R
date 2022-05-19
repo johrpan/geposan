@@ -410,6 +410,13 @@ plot_scores_by_position <- function(ranking,
         by = "gene"
     )
 
+    data <- merge(
+        data,
+        geposan::genes,
+        by.x = "gene",
+        by.y = "id"
+    )
+
     data[, `:=`(gene_set = "All genes", color = base_color())]
 
     index <- 1
@@ -432,7 +439,13 @@ plot_scores_by_position <- function(ranking,
             x = ~start_position,
             y = ~score,
             name = ~gene_set,
-            hoverinfo = "skip"
+            text = ~name,
+            hovertemplate = paste0(
+                "<b>%{text}</b><br>",
+                "Position: %{x:.0} Bp<br>",
+                "Score: %{y:.3}<br>",
+                "<extra></extra>"
+            )
         ) |>
         plotly::layout(
             xaxis = list(title = "Position (Bp)"),
