@@ -22,6 +22,7 @@ Depends:
     R (>= 2.10)
 Imports:
     data.table,
+    glue,
     keras,
     rlang,
     progress,

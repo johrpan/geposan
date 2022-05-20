@@ -73,8 +73,12 @@ plot_positions <- function(species_ids, gene_sets) {
                 data = gene_set_data[gene %chin% gene_set],
                 x = ~species,
                 y = ~distance,
-                text = ~name,
                 name = gene_set_name,
+                text = ~glue::glue(
+                    "<b>{name}</b><br>",
+                    "{round(distance / 1000000, digits = 2)} MBp"
+                ),
+                hoverinfo = "text",
                 marker = list(
                     size = 10,
                     color = gene_set_color(index)
@@ -151,14 +155,13 @@ plot_rankings <- function(rankings, gene_sets) {
                     x = ranking_name,
                     y = ~score,
                     name = gene_set_name,
-                    text = ~name,
-                    customdata = ~percentile,
-                    hovertemplate = paste0(
-                        "<b>%{text}</b><br>",
-                        "Score: %{y:.3}<br>",
-                        "Percentile: %{customdata:.2%}",
-                        "<extra></extra>"
+                    text = ~glue::glue(
+                        "<b>{name}</b><br>",
+                        "Score: {round(score, digits = 2)}<br>",
+                        "Rank: {rank}<br>",
+                        "Percentile: {round(percentile * 100, digits = 2)}%"
                     ),
+                    hoverinfo = "text",
                     showlegend = is_first,
                     marker = list(
                         size = 10,
@@ -235,15 +238,13 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
                 x = ~percentile,
                 y = ~score,
                 name = gene_set_name,
-                text = ~name,
-                customdata = ~rank,
-                hovertemplate = paste0(
-                    "<b>%{text}</b><br>",
-                    "Score: %{y:.3}<br>",
-                    "Rank: %{customdata}<br>",
-                    "Percentile: %{x:.2%}",
-                    "<extra></extra>"
+                text = ~glue::glue(
+                    "<b>{name}</b><br>",
+                    "Score: {round(score, digits = 2)}<br>",
+                    "Rank: {rank}<br>",
+                    "Percentile: {round(percentile * 100, digits = 2)}%"
                 ),
+                hoverinfo = "text",
                 marker = list(
                     size = 10,
                     color = gene_set_color(index)
@@ -439,13 +440,15 @@ plot_scores_by_position <- function(ranking,
             x = ~start_position,
             y = ~score,
             name = ~gene_set,
-            text = ~name,
-            hovertemplate = paste0(
-                "<b>%{text}</b><br>",
-                "Position: %{x:.0} Bp<br>",
-                "Score: %{y:.3}<br>",
-                "<extra></extra>"
-            )
+            text = ~glue::glue(
+                "<b>{name}</b><br>",
+                "Position: ",
+                "{round(start_position / 1000000, digits = 2)} MBp<br>",
+                "Score: {round(score, digits = 2)}<br>",
+                "Rank: {rank}<br>",
+                "Percentile: {round(percentile * 100, digits = 2)}%"
+            ),
+            hoverinfo = "text",
         ) |>
         plotly::layout(
             xaxis = list(title = "Position (Bp)"),
