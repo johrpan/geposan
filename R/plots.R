@@ -74,7 +74,7 @@ plot_positions <- function(species_ids, gene_sets) {
                 x = ~species,
                 y = ~distance,
                 name = gene_set_name,
-                text = ~glue::glue(
+                text = ~ glue::glue(
                     "<b>{name}</b><br>",
                     "{round(distance / 1000000, digits = 2)} MBp"
                 ),
@@ -155,7 +155,7 @@ plot_rankings <- function(rankings, gene_sets) {
                     x = ranking_name,
                     y = ~score,
                     name = gene_set_name,
-                    text = ~glue::glue(
+                    text = ~ glue::glue(
                         "<b>{name}</b><br>",
                         "Score: {round(score, digits = 2)}<br>",
                         "Rank: {rank}<br>",
@@ -238,7 +238,7 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
                 x = ~percentile,
                 y = ~score,
                 name = gene_set_name,
-                text = ~glue::glue(
+                text = ~ glue::glue(
                     "<b>{name}</b><br>",
                     "Score: {round(score, digits = 2)}<br>",
                     "Rank: {rank}<br>",
@@ -385,7 +385,9 @@ plot_chromosomes <- function(ranking) {
 #' Plot scores in relation to chromosomal position of genes.
 #'
 #' @param ranking The ranking to visualize.
-#' @param chromosome_name The chromosome to visualize.
+#' @param chromosome_name The chromosome to visualize. If this is `NULL` all,
+#'   chromosomes will be included and the x-axis will show distances instead of
+#'   positions.
 #' @param gene_sets Named list of vectors of genes to highlight. The list names
 #'   will be used as labels.
 #'
@@ -394,22 +396,23 @@ plot_chromosomes <- function(ranking) {
 #'
 #' @export
 plot_scores_by_position <- function(ranking,
-                                    chromosome_name,
+                                    chromosome_name = NULL,
                                     gene_sets = NULL) {
     if (!requireNamespace("plotly", quietly = TRUE)) {
         stop("Please install \"plotly\" to use this function.")
     }
 
-    chromosome_name_ <- chromosome_name
-
-    data <- merge(
-        ranking,
+    distance_data <- if (!is.null(chromosome_name)) {
+        chromosome_name_ <- chromosome_name
         geposan::distances[
             species == "hsapiens" &
                 chromosome_name == chromosome_name_
-        ],
-        by = "gene"
-    )
+        ]
+    } else {
+        geposan::distances[species == "hsapiens"]
+    }
+
+    data <- merge(ranking, distance_data, by = "gene")
 
     data <- merge(
         data,
@@ -434,16 +437,23 @@ plot_scores_by_position <- function(ranking,
         index <- index + 1
     }
 
+    # Use distances instead of positions in case all chromosomes are included.
+    if (is.null(chromosome_name)) {
+        data[, x := distance]
+    } else {
+        data[, x := start_position]
+    }
+
     plotly::plot_ly() |>
         plotly::add_markers(
             data = data,
-            x = ~start_position,
+            x = ~x,
             y = ~score,
             name = ~gene_set,
-            text = ~glue::glue(
+            text = ~ glue::glue(
                 "<b>{name}</b><br>",
-                "Position: ",
-                "{round(start_position / 1000000, digits = 2)} MBp<br>",
+                if (is.null(chromosome_name)) "Distance: " else "Position: ",
+                "{round(x / 1000000, digits = 2)} MBp<br>",
                 "Score: {round(score, digits = 2)}<br>",
                 "Rank: {rank}<br>",
                 "Percentile: {round(percentile * 100, digits = 2)}%"
@@ -451,7 +461,11 @@ plot_scores_by_position <- function(ranking,
             hoverinfo = "text",
         ) |>
         plotly::layout(
-            xaxis = list(title = "Position (Bp)"),
+            xaxis = list(title = if (is.null(chromosome_name)) {
+                "Distance (Bp)"
+            } else {
+                "Position (Bp)"
+            }),
             yaxis = list(title = "Score")
         )
 }

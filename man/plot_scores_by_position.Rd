@@ -4,12 +4,14 @@
 \alias{plot_scores_by_position}
 \title{Plot scores in relation to chromosomal position of genes.}
 \usage{
-plot_scores_by_position(ranking, chromosome_name, gene_sets = NULL)
+plot_scores_by_position(ranking, chromosome_name = NULL, gene_sets = NULL)
 }
 \arguments{
 \item{ranking}{The ranking to visualize.}
 
-\item{chromosome_name}{The chromosome to visualize.}
+\item{chromosome_name}{The chromosome to visualize. If this is \code{NULL} all,
+chromosomes will be included and the x-axis will show distances instead of
+positions.}
 
 \item{gene_sets}{Named list of vectors of genes to highlight. The list names
 will be used as labels.}
