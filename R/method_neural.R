@@ -7,11 +7,19 @@
 #'   final score will be the mean of the result of applying the different
 #'   models. There should be at least two training sets. The analysis will only
 #'   work, if there is at least one reference gene per training set.
+#' @param gene_requirement Minimum proportion of genes from the preset that a
+#'   species has to have in order to be included in the models.
+#' @param control_ratio The proportion of random control genes that is included
+#'   in the training data sets in addition to the reference genes. This should
+#'   be a numeric value between 0.0 and 1.0.
 #'
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-neural <- function(seed = 180199, n_models = 5) {
+neural <- function(seed = 180199,
+                       n_models = 5,
+                       gene_requirement = 0.5,
+                       control_ratio = 0.5) {
   method(
     id = "neural",
     name = "Neural",
@@ -23,10 +31,21 @@ neural <- function(seed = 180199, n_models = 5) {
 
       cached(
         "neural",
-        c(species_ids, gene_ids, reference_gene_ids, seed, n_models),
+        c(
+          species_ids,
+          gene_ids,
+          reference_gene_ids,
+          seed,
+          n_models,
+          gene_requirement,
+          control_ratio
+        ),
         { # nolint
           reference_count <- length(reference_gene_ids)
           stopifnot(n_models %in% 2:reference_count)
+
+          control_count <- ceiling(reference_count * control_ratio /
+            (1 - control_ratio))
 
           # Make results reproducible.
           tensorflow::set_random_seed(seed)
@@ -34,54 +53,30 @@ neural <- function(seed = 180199, n_models = 5) {
           # Step 1: Prepare input data.
           # ---------------------------
 
-          # Prefilter distances by species.
-          distances <- geposan::distances[species %chin% species_ids]
+          # Prefilter distances by species and gene.
+          distances <- geposan::distances[species %chin% species_ids &
+            gene %chin% gene_ids]
 
-          # Input data for the network. This contains the gene ID as
-          # an identifier as well as the per-species gene distances as
-          # input variables.
-          data <- data.table(gene = gene_ids)
+          # Only include species that have at least 25% of the included genes.
+          distances[, species_n_genes := .N, by = species]
+          distances <- distances[species_n_genes >=
+            gene_requirement * length(gene_ids)]
+          included_species <- distances[, unique(species)]
 
-          # Buffer to keep track of the names of the input variables.
-          input_vars <- NULL
+          # Reshape data to put species into columns.
+          data <- dcast(
+            distances,
+            gene ~ species,
+            value.var = "distance"
+          )
 
-          # Make a columns containing positions and distances for each
-          # species.
-          for (species_id in species_ids) {
-            species_data <- distances[
-              species == species_id,
-              .(gene, distance)
-            ]
-
-            # Only include species with at least 25% known values.
-            # As positions and distances always coexist, we don't
-            # loose any data here.
-
-            species_data <- stats::na.omit(species_data)
-
-            if (nrow(species_data) >= 0.25 * length(gene_ids)) {
-              data <- merge(data, species_data, all.x = TRUE)
-
-              # Replace missing data with mean values. The neural
-              # network can't handle NAs in a meaningful way.
-              # Choosing extreme values here would result in
-              # heavily biased results. Therefore, the mean value
-              # is chosen as a compromise. However, this will of
-              # course lessen the significance of the results.
-
-              mean_distance <- round(
-                species_data[, mean(distance)]
-              )
-
-              data[is.na(distance), distance := mean_distance]
-
-              # Name the new column after the species.
-              setnames(data, "distance", species_id)
-
-              # Add the input variable to the buffer.
-              input_vars <- c(input_vars, species_id)
-            }
-          }
+          # Replace values that are still missing with mean values for the
+          # species in question.
+          data[, (included_species) := lapply(included_species, \(species) {
+            species <- get(species)
+            species[is.na(species)] <- mean(species, na.rm = TRUE)
+            species
+          })]
 
           progress(0.1)
 
@@ -89,140 +84,81 @@ neural <- function(seed = 180199, n_models = 5) {
           # ------------------------------
 
           # Take out the reference data.
-
           reference_data <- data[gene %chin% reference_gene_ids]
           reference_data[, score := 1.0]
 
-          # Take out random samples from the remaining genes. This is
-          # another compromise with a negative impact on
-          # significance. We assume that a random gene is not likely
-          # to match the reference genes.
-
-          without_reference_data <- data[
-            !gene %chin% reference_gene_ids
+          # Draw control data from the remaining genes.
+          control_data <- data[!gene %chin% reference_gene_ids][
+            sample(.N, control_count)
           ]
-
-          control_data <- without_reference_data[
-            sample(
-              nrow(without_reference_data),
-              reference_count
-            )
-          ]
-
           control_data[, score := 0.0]
 
-          # Split the training data into random sets to have
-          # validation data for each model.
+          # Randomly distribute the indices of the reference and control genes
+          # across one bucket per model.
 
-          # Scramble the source tables.
-          reference_data <- reference_data[sample(reference_count)]
-          control_data <- control_data[sample(reference_count)]
+          reference_sets <- split(
+            sample(reference_count),
+            seq_len(reference_count) %% n_models
+          )
 
-          networks <- list()
+          control_sets <- split(
+            sample(control_count),
+            seq_len(control_count) %% n_models
+          )
 
-          indices <- seq_len(reference_count)
-          indices_split <- split(indices, indices %% n_models)
-
-          for (i in seq_len(n_models)) {
+          # Prepare the data for each model. Each model will have one pair of
+          # reference and control gene sets left out for validation. The
+          # training data consists of all the remaining sets.
+          networks <- lapply(seq_len(n_models), \(index) {
             training_data <- rbindlist(list(
-              reference_data[!indices_split[[i]]],
-              control_data[!indices_split[[i]]]
+              reference_data[!reference_sets[[index]]],
+              control_data[!control_sets[[index]]]
             ))
 
             validation_data <- rbindlist(list(
-              reference_data[indices_split[[i]]],
-              control_data[indices_split[[i]]]
+              reference_data[reference_sets[[index]]],
+              control_data[control_sets[[index]]]
             ))
 
-            networks[[i]] <- list(
+            list(
               training_data = training_data,
               validation_data = validation_data
             )
-          }
+          })
 
           # Step 3: Create, train and apply neural network.
           # -----------------------------------------------
 
-          # Layers for the neural network.
-          input_layer <- length(input_vars)
-          layer1 <- input_layer
-          layer2 <- 0.5 * input_layer
-          layer3 <- 0.5 * layer2
-
-          # Convert data to matrix and normalize it.
-          to_matrix <- function(data) {
-            data_matrix <- as.matrix(data[, ..input_vars])
-            colnames(data_matrix) <- NULL
-            keras::normalize(data_matrix)
-          }
-
-          data_matrix <- to_matrix(data)
+          data_matrix <- prepare_data(data, included_species)
           output_vars <- NULL
 
           for (i in seq_along(networks)) {
+            network <- networks[[i]]
+
             # Create a new model for each training session, because
             # the model would keep its state across training
             # sessions otherwise.
-            model <- keras::keras_model_sequential() |>
-              keras::layer_dense(
-                units = layer1,
-                activation = "relu",
-                input_shape = input_layer,
-              ) |>
-              keras::layer_dense(
-                units = layer2,
-                activation = "relu",
-                kernel_regularizer = keras::regularizer_l2()
-              ) |>
-              keras::layer_dense(
-                units = layer3,
-                activation = "relu",
-                kernel_regularizer = keras::regularizer_l2()
-              ) |>
-              keras::layer_dense(
-                units = 1,
-                activation = "sigmoid"
-              ) |>
-              keras::compile(
-                loss = keras::loss_mean_absolute_error(),
-                optimizer = keras::optimizer_adam()
-              )
+            model <- create_model(length(included_species))
 
             # Train the model.
-
-            network <- networks[[i]]
-
-            training_data <- network$training_data
-            training_matrix <- to_matrix(training_data)
-            validation_data <- network$validation_data
-            validation_matrix <- to_matrix(validation_data)
-
-            fit <- keras::fit(
+            fit <- train_model(
               model,
-              x = training_matrix,
-              y = training_data$score,
-              validation_data = list(
-                x_val = validation_matrix,
-                y_val = validation_data$score
-              ),
-              epochs = 500,
-              verbose = FALSE
+              network$training_data,
+              network$validation_data,
+              included_species
             )
 
             # Apply the model.
-
             data[, new_score := stats::predict(model, data_matrix)]
 
             # Remove the values of the training data itself.
-            data[gene %chin% training_data$gene, new_score := NA]
+            data[gene %chin% network$training_data$gene, new_score := NA]
 
             output_var <- sprintf("score%i", i)
             setnames(data, "new_score", output_var)
             output_vars <- c(output_vars, output_var)
 
-
             # Store the details.
-
             networks[[i]]$model <- keras::serialize_model(model)
             networks[[i]]$fit <- fit
 
@@ -244,7 +180,7 @@ neural <- function(seed = 180199, n_models = 5) {
             details = list(
               seed = seed,
               n_models = n_models,
-              all_results = data[, !..input_vars],
+              all_results = data[, !..included_species],
               networks = networks
             )
           )
@@ -252,4 +188,84 @@ neural <- function(seed = 180199, n_models = 5) {
       )
     }
   )
+}
+
+#' Create a `keras` model based on the number of input variables.
+#'
+#' @param n_input_vars Number of input variables (i.e. species).
+#' @return A `keras` model.
+#'
+#' @noRd
+create_model <- function(n_input_vars) {
+  # Layers for the neural network.
+  layer1 <- n_input_vars
+  layer2 <- 0.5 * layer1
+  layer3 <- 0.5 * layer2
+
+  keras::keras_model_sequential() |>
+    keras::layer_dense(
+      units = layer1,
+      activation = "relu",
+      input_shape = n_input_vars,
+    ) |>
+    keras::layer_dense(
+      units = layer2,
+      activation = "relu",
+      kernel_regularizer = keras::regularizer_l2()
+    ) |>
+    keras::layer_dense(
+      units = layer3,
+      activation = "relu",
+      kernel_regularizer = keras::regularizer_l2()
+    ) |>
+    keras::layer_dense(
+      units = 1,
+      activation = "sigmoid"
+    ) |>
+    keras::compile(
+      loss = keras::loss_mean_absolute_error(),
+      optimizer = keras::optimizer_adam()
+    )
+}
+
+#' Train a model on a specific training dataset.
+#'
+#' @param model The model created using [create_model()]. The model will be
+#'   changed reflecting the state after training.
+#' @param training_data Data to fit the model to.
+#' @param validation_data Additional data to assess the model performance.
+#' @param input_vars Character vector of input variables that should be
+#'   included.
+#'
+#' @return The `keras` fit object describing the training process.
+#' @noRd
+train_model <- function(model, training_data, validation_data, input_vars) {
+  training_matrix <- prepare_data(training_data, input_vars)
+  validation_matrix <- prepare_data(validation_data, input_vars)
+
+  keras::fit(
+    model,
+    x = training_matrix,
+    y = training_data$score,
+    validation_data = list(
+      x_val = validation_matrix,
+      y_val = validation_data$score
+    ),
+    epochs = 500,
+    verbose = FALSE
+  )
+}
+
+#' Convert data to a matrix and normalize it.
+#'
+#' @param data Input data.
+#' @param input_vars Character vector of input variables that should be
+#'   included.
+#'
+#' @return A data matrix that can be used within the models.
+#' @noRd
+prepare_data <- function(data, input_vars) {
+  data_matrix <- as.matrix(data[, ..input_vars])
+  colnames(data_matrix) <- NULL
+  keras::normalize(data_matrix)
 }
