@@ -27,68 +27,68 @@
 #'
 #' @export
 validate <- function(ranking, reference_gene_ids, method_ids, progress = NULL) {
-    if (!inherits(ranking, "geposan_ranking")) {
-        stop("Ranking is invalid. Use geposan::ranking().")
-    }
+  if (!inherits(ranking, "geposan_ranking")) {
+    stop("Ranking is invalid. Use geposan::ranking().")
+  }
 
-    if (is.null(progress)) {
-        progress_bar <- progress::progress_bar$new()
-        progress_bar$update(0.0)
+  if (is.null(progress)) {
+    progress_bar <- progress::progress_bar$new()
+    progress_bar$update(0.0)
 
-        progress <- function(progress_value) {
-            if (!progress_bar$finished) {
-                progress_bar$update(progress_value)
-                if (progress_value >= 1.0) {
-                    progress_bar$terminate()
-                }
-            }
+    progress <- function(progress_value) {
+      if (!progress_bar$finished) {
+        progress_bar$update(progress_value)
+        if (progress_value >= 1.0) {
+          progress_bar$terminate()
         }
+      }
     }
+  }
 
-    progress_state <- 0.0
-    progress_step <- 1.0 / length(reference_gene_ids)
+  progress_state <- 0.0
+  progress_step <- 1.0 / length(reference_gene_ids)
 
-    results <- ranking[gene %chin% reference_gene_ids, .(gene, percentile)]
+  results <- ranking[gene %chin% reference_gene_ids, .(gene, percentile)]
 
-    for (gene_id in reference_gene_ids) {
-        included_gene_ids <- reference_gene_ids[
-            reference_gene_ids != gene_id
-        ]
+  for (gene_id in reference_gene_ids) {
+    included_gene_ids <- reference_gene_ids[
+      reference_gene_ids != gene_id
+    ]
 
-        weights <- optimal_weights(
-            ranking,
-            method_ids,
-            included_gene_ids
-        )
-
-        ranking_validation <- ranking(ranking, weights)
-
-        results[
-            gene == gene_id,
-            percentile_validation := ranking_validation[
-                gene == gene_id,
-                percentile
-            ]
-        ]
-
-        if (!is.null(progress)) {
-            progress_state <- progress_state + progress_step
-            progress(progress_state)
-        }
-    }
-
-    results[, error := percentile - percentile_validation]
-    setorder(results, error)
-
-    structure(
-        list(
-            validation = results,
-            mean_percentile_original = results[, mean(percentile)],
-            mean_percentile_validation = results[, mean(percentile_validation)],
-            mean_error = results[, mean(error)]
-        ),
-        class = "geposan_validation"
+    weights <- optimal_weights(
+      ranking,
+      method_ids,
+      included_gene_ids
     )
+
+    ranking_validation <- ranking(ranking, weights)
+
+    results[
+      gene == gene_id,
+      percentile_validation := ranking_validation[
+        gene == gene_id,
+        percentile
+      ]
+    ]
+
+    if (!is.null(progress)) {
+      progress_state <- progress_state + progress_step
+      progress(progress_state)
+    }
+  }
+
+  results[, error := percentile - percentile_validation]
+  setorder(results, error)
+
+  structure(
+    list(
+      validation = results,
+      mean_percentile_original = results[, mean(percentile)],
+      mean_percentile_validation = results[, mean(percentile_validation)],
+      mean_error = results[, mean(error)]
+    ),
+    class = "geposan_validation"
+  )
 }
 
 #' S3 method to print a validation object.
@@ -100,18 +100,18 @@ validate <- function(ranking, reference_gene_ids, method_ids, progress = NULL) {
 #'
 #' @export
 print.geposan_validation <- function(x, ...) {
-    cat(sprintf(
-        paste0(
-            "geposan validation:",
-            "\n  Mean percentile original: %.1f%%",
-            "\n  Mean percentile validation: %.1f%%",
-            "\n  Mean error: %.1f percent points",
-            "\n"
-        ),
-        x$mean_percentile_original * 100,
-        x$mean_percentile_validation * 100,
-        x$mean_error * 100
-    ))
+  cat(sprintf(
+    paste0(
+      "geposan validation:",
+      "\n  Mean percentile original: %.1f%%",
+      "\n  Mean percentile validation: %.1f%%",
+      "\n  Mean error: %.1f percent points",
+      "\n"
+    ),
+    x$mean_percentile_original * 100,
+    x$mean_percentile_validation * 100,
+    x$mean_error * 100
+  ))
 
-    invisible(x)
+  invisible(x)
 }

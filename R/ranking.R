@@ -13,35 +13,35 @@
 #'
 #' @export
 ranking <- function(analysis, weights) {
-    ranking <- if (inherits(analysis, "geposan_analysis")) {
-        copy(analysis$scores)
-    } else if (inherits(analysis, "geposan_ranking")) {
-        copy(analysis)
-    } else {
-        stop("Invalid analyis. Use geposan::analyze().")
-    }
+  ranking <- if (inherits(analysis, "geposan_analysis")) {
+    copy(analysis$scores)
+  } else if (inherits(analysis, "geposan_ranking")) {
+    copy(analysis)
+  } else {
+    stop("Invalid analyis. Use geposan::analyze().")
+  }
 
-    ranking[, score := 0.0]
+  ranking[, score := 0.0]
 
-    for (method in names(weights)) {
-        weighted <- weights[[method]] * ranking[, ..method]
-        ranking[, score := score + weighted]
-    }
+  for (method in names(weights)) {
+    weighted <- weights[[method]] * ranking[, ..method]
+    ranking[, score := score + weighted]
+  }
 
-    # Normalize scores to be between 0.0 and 1.0.
-    min_score <- ranking[, min(score)]
-    max_score <- ranking[, max(score)]
-    score_range <- max_score - min_score
-    ranking[, score := (score - min_score) / score_range]
+  # Normalize scores to be between 0.0 and 1.0.
+  min_score <- ranking[, min(score)]
+  max_score <- ranking[, max(score)]
+  score_range <- max_score - min_score
+  ranking[, score := (score - min_score) / score_range]
 
-    setorder(ranking, -score)
-    ranking[, rank := .I]
-    ranking[, percentile := 1 - rank / nrow(ranking)]
+  setorder(ranking, -score)
+  ranking[, rank := .I]
+  ranking[, percentile := 1 - rank / nrow(ranking)]
 
-    structure(
-        ranking,
-        class = c("geposan_ranking", class(ranking))
-    )
+  structure(
+    ranking,
+    class = c("geposan_ranking", class(ranking))
+  )
 }
 
 #' Find the best weights to rank the results.
@@ -61,40 +61,40 @@ ranking <- function(analysis, weights) {
 #' @export
 optimal_weights <- function(analysis, methods, reference_gene_ids,
                             target = "mean") {
-    if (!inherits(analysis, c("geposan_analysis", "geposan_ranking"))) {
-        stop("Invalid analyis. Use geposan::analyze().")
+  if (!inherits(analysis, c("geposan_analysis", "geposan_ranking"))) {
+    stop("Invalid analyis. Use geposan::analyze().")
+  }
+
+
+  # Compute the target rank of the reference genes when applying the
+  # weights.
+  target_rank <- function(factors) {
+    data <- ranking(analysis, as.list(factors))
+
+    result <- data[
+      gene %chin% reference_gene_ids,
+      if (target == "min") {
+        min(rank)
+      } else if (target == "max") {
+        max(rank)
+      } else if (target == "mean") {
+        mean(rank)
+      } else {
+        stats::median(rank)
+      }
+    ]
+
+    if (result > 0) {
+      result
+    } else {
+      Inf
     }
+  }
 
+  initial_factors <- rep(1.0, length(methods))
+  names(initial_factors) <- methods
 
-    # Compute the target rank of the reference genes when applying the
-    # weights.
-    target_rank <- function(factors) {
-        data <- ranking(analysis, as.list(factors))
+  optimal_factors <- stats::optim(initial_factors, target_rank)$par
 
-        result <- data[
-            gene %chin% reference_gene_ids,
-            if (target == "min") {
-                min(rank)
-            } else if (target == "max") {
-                max(rank)
-            } else if (target == "mean") {
-                mean(rank)
-            } else {
-                stats::median(rank)
-            }
-        ]
-
-        if (result > 0) {
-            result
-        } else {
-            Inf
-        }
-    }
-
-    initial_factors <- rep(1.0, length(methods))
-    names(initial_factors) <- methods
-
-    optimal_factors <- stats::optim(initial_factors, target_rank)$par
-
-    as.list(optimal_factors / max(abs(optimal_factors)))
+  as.list(optimal_factors / max(abs(optimal_factors)))
 }

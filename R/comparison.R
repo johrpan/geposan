@@ -18,38 +18,38 @@
 #'
 #' @export
 compare <- function(ranking, comparison_gene_ids) {
-    if (!inherits(ranking, "geposan_ranking")) {
-        stop("Invalid ranking. Use geposan::ranking().")
-    }
+  if (!inherits(ranking, "geposan_ranking")) {
+    stop("Invalid ranking. Use geposan::ranking().")
+  }
 
-    comparison_ranking <- ranking[gene %chin% comparison_gene_ids]
+  comparison_ranking <- ranking[gene %chin% comparison_gene_ids]
 
-    quantiles <- data.table(
-        quantile = c("0%", "25%", "50%", "75%", "100%"),
-        score = stats::quantile(comparison_ranking[, score]),
-        rank = stats::quantile(
-            comparison_ranking[, rank],
-            probs = seq(1, 0, -0.25)
-        ),
-        percentile = stats::quantile(comparison_ranking[, percentile])
-    )
+  quantiles <- data.table(
+    quantile = c("0%", "25%", "50%", "75%", "100%"),
+    score = stats::quantile(comparison_ranking[, score]),
+    rank = stats::quantile(
+      comparison_ranking[, rank],
+      probs = seq(1, 0, -0.25)
+    ),
+    percentile = stats::quantile(comparison_ranking[, percentile])
+  )
 
-    p_value <- stats::wilcox.test(
-        x = comparison_ranking[, score],
-        y = ranking[!gene %chin% comparison_gene_ids, score],
-        alternative = "greater"
-    )$p.value
+  p_value <- stats::wilcox.test(
+    x = comparison_ranking[, score],
+    y = ranking[!gene %chin% comparison_gene_ids, score],
+    alternative = "greater"
+  )$p.value
 
-    structure(
-        list(
-            quantiles = quantiles,
-            mean_score = comparison_ranking[, mean(score)],
-            mean_rank = comparison_ranking[, mean(rank)],
-            mean_percentile = comparison_ranking[, mean(percentile)],
-            p_value = p_value
-        ),
-        class = "geposan_comparison"
-    )
+  structure(
+    list(
+      quantiles = quantiles,
+      mean_score = comparison_ranking[, mean(score)],
+      mean_rank = comparison_ranking[, mean(rank)],
+      mean_percentile = comparison_ranking[, mean(percentile)],
+      p_value = p_value
+    ),
+    class = "geposan_comparison"
+  )
 }
 
 #' S3 method to print a comparison object.
@@ -61,32 +61,32 @@ compare <- function(ranking, comparison_gene_ids) {
 #'
 #' @export
 print.geposan_comparison <- function(x, ...) {
-    cat("geposan comparison:\n\n")
+  cat("geposan comparison:\n\n")
 
-    quantiles_formatted <- x$quantiles[, .(
-        "Quantile" = quantile,
-        "Score" = round(score, 3),
-        "Rank" = rank,
-        "Percentile" = paste0(
-            format(round(percentile * 100, 1), nsmall = 1),
-            "%"
-        )
-    )]
+  quantiles_formatted <- x$quantiles[, .(
+    "Quantile" = quantile,
+    "Score" = round(score, 3),
+    "Rank" = rank,
+    "Percentile" = paste0(
+      format(round(percentile * 100, 1), nsmall = 1),
+      "%"
+    )
+  )]
 
-    print(quantiles_formatted, row.names = FALSE)
+  print(quantiles_formatted, row.names = FALSE)
 
-    cat(sprintf(
-        paste0(
-            "\n  Mean score: %.3f",
-            "\n  Mean rank: %.1f",
-            "\n  Mean percentile: %.1f%%",
-            "\n  p-value for better scores: %.4f\n"
-        ),
-        x$mean_score,
-        x$mean_rank,
-        x$mean_percentile * 100,
-        x$p_value
-    ))
+  cat(sprintf(
+    paste0(
+      "\n  Mean score: %.3f",
+      "\n  Mean rank: %.1f",
+      "\n  Mean percentile: %.1f%%",
+      "\n  p-value for better scores: %.4f\n"
+    ),
+    x$mean_score,
+    x$mean_rank,
+    x$mean_percentile * 100,
+    x$p_value
+  ))
 
-    invisible(x)
+  invisible(x)
 }

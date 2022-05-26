@@ -11,38 +11,38 @@
 #'
 #' @export
 proximity <- function(summarize = stats::median) {
-    method(
-        id = "proximity",
-        name = "Proximity",
-        description = "Proximity to telomeres",
-        function(preset, progress) {
-            species_ids <- preset$species_ids
-            gene_ids <- preset$gene_ids
+  method(
+    id = "proximity",
+    name = "Proximity",
+    description = "Proximity to telomeres",
+    function(preset, progress) {
+      species_ids <- preset$species_ids
+      gene_ids <- preset$gene_ids
 
-            cached("proximity", c(species_ids, gene_ids), {
-                # Prefilter distances by species and gene.
-                data <- geposan::distances[
-                    species %chin% preset$species_ids &
-                        gene %chin% preset$gene_ids
-                ]
+      cached("proximity", c(species_ids, gene_ids), {
+        # Prefilter distances by species and gene.
+        data <- geposan::distances[
+          species %chin% preset$species_ids &
+            gene %chin% preset$gene_ids
+        ]
 
-                # Compute the score as described above.
-                data <- data[,
-                    .(combined_distance = as.double(summarize(distance))),
-                    by = "gene"
-                ]
+        # Compute the score as described above.
+        data <- data[,
+          .(combined_distance = as.double(summarize(distance))),
+          by = "gene"
+        ]
 
-                # Normalize scores.
-                data[, score := 1 - combined_distance / max(combined_distance)]
+        # Normalize scores.
+        data[, score := 1 - combined_distance / max(combined_distance)]
 
-                progress(1.0)
+        progress(1.0)
 
-                result(
-                    method = "proximity",
-                    scores = data[, .(gene, score)],
-                    details = list(data = data)
-                )
-            })
-        }
-    )
+        result(
+          method = "proximity",
+          scores = data[, .(gene, score)],
+          details = list(data = data)
+        )
+      })
+    }
+  )
 }

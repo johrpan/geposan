@@ -13,33 +13,33 @@
 #'   default), the first cluster will weigh 1.0, the second 0.7, the third 0.49
 #'   etc.
 clusteriness <- function(data, span = 100000, weight = 0.7) {
-    n <- length(data)
+  n <- length(data)
 
-    # Return a score of 0.0 if there is just one or no value at all.
-    if (n < 2) {
-        return(0.0)
+  # Return a score of 0.0 if there is just one or no value at all.
+  if (n < 2) {
+    return(0.0)
+  }
+
+  # Cluster the data and compute the cluster sizes.
+
+  tree <- stats::hclust(stats::dist(data))
+  clusters <- stats::cutree(tree, h = span)
+  cluster_sizes <- sort(tabulate(clusters), decreasing = TRUE)
+
+  # Compute the "clusteriness" score.
+
+  score <- 0.0
+
+  for (i in seq_along(cluster_sizes)) {
+    cluster_size <- cluster_sizes[i]
+
+    if (cluster_size >= 2) {
+      cluster_score <- cluster_size / n
+      score <- score + weight^(i - 1) * cluster_score
     }
+  }
 
-    # Cluster the data and compute the cluster sizes.
-
-    tree <- stats::hclust(stats::dist(data))
-    clusters <- stats::cutree(tree, h = span)
-    cluster_sizes <- sort(tabulate(clusters), decreasing = TRUE)
-
-    # Compute the "clusteriness" score.
-
-    score <- 0.0
-
-    for (i in seq_along(cluster_sizes)) {
-        cluster_size <- cluster_sizes[i]
-
-        if (cluster_size >= 2) {
-            cluster_score <- cluster_size / n
-            score <- score + weight^(i - 1) * cluster_score
-        }
-    }
-
-    score
+  score
 }
 
 #' Process genes clustering their distance to telomeres.
@@ -53,41 +53,41 @@ clusteriness <- function(data, span = 100000, weight = 0.7) {
 #'
 #' @export
 clustering <- function() {
-    method(
-        id = "clustering",
-        name = "Clustering",
-        description = "Clustering of genes",
-        function(preset, progress) {
-            species_ids <- preset$species_ids
-            gene_ids <- preset$gene_ids
+  method(
+    id = "clustering",
+    name = "Clustering",
+    description = "Clustering of genes",
+    function(preset, progress) {
+      species_ids <- preset$species_ids
+      gene_ids <- preset$gene_ids
 
-            cached("clustering", c(species_ids, gene_ids), {
-                scores <- data.table(gene = gene_ids)
+      cached("clustering", c(species_ids, gene_ids), {
+        scores <- data.table(gene = gene_ids)
 
-                # Prefilter the input data by species.
-                distances <- geposan::distances[species %chin% species_ids]
+        # Prefilter the input data by species.
+        distances <- geposan::distances[species %chin% species_ids]
 
-                genes_done <- 0
-                genes_total <- length(gene_ids)
+        genes_done <- 0
+        genes_total <- length(gene_ids)
 
-                # Perform the cluster analysis for one gene.
-                compute <- function(gene_id) {
-                    data <- distances[gene == gene_id, distance]
-                    score <- clusteriness(data)
+        # Perform the cluster analysis for one gene.
+        compute <- function(gene_id) {
+          data <- distances[gene == gene_id, distance]
+          score <- clusteriness(data)
 
-                    genes_done <<- genes_done + 1
-                    progress(genes_done / genes_total)
+          genes_done <<- genes_done + 1
+          progress(genes_done / genes_total)
 
-                    score
-                }
-
-                scores[, score := compute(gene), by = gene]
-
-                result(
-                    method = "clustering",
-                    scores = scores
-                )
-            })
+          score
         }
-    )
+
+        scores[, score := compute(gene), by = gene]
+
+        result(
+          method = "clustering",
+          scores = scores
+        )
+      })
+    }
+  )
 }

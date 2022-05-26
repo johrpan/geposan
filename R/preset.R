@@ -21,55 +21,55 @@ preset <- function(reference_gene_ids,
                    methods = all_methods(),
                    species_ids = geposan::species$id,
                    gene_ids = geposan::genes$id) {
-    # Count included species per gene.
-    genes_n_species <- geposan::distances[
-        species %chin% species_ids,
-        .(n_species = .N),
-        by = "gene"
-    ]
+  # Count included species per gene.
+  genes_n_species <- geposan::distances[
+    species %chin% species_ids,
+    .(n_species = .N),
+    by = "gene"
+  ]
 
-    # Filter out genes with less than 25% existing orthologs.
-    gene_ids_filtered <- genes_n_species[
-        gene %chin% gene_ids &
-            n_species >= 0.25 * length(species_ids),
-        gene
-    ]
+  # Filter out genes with less than 25% existing orthologs.
+  gene_ids_filtered <- genes_n_species[
+    gene %chin% gene_ids &
+      n_species >= 0.25 * length(species_ids),
+    gene
+  ]
 
-    reference_gene_ids_excluded <- reference_gene_ids[
-        !reference_gene_ids %chin% gene_ids_filtered
-    ]
+  reference_gene_ids_excluded <- reference_gene_ids[
+    !reference_gene_ids %chin% gene_ids_filtered
+  ]
 
-    if (length(reference_gene_ids_excluded > 0)) {
-        warning(paste0(
-            "The following reference gene IDs are excluded from the preset ",
-            "because they don't have enough data: ",
-            paste(reference_gene_ids_excluded, collapse = ", ")
-        ))
-    }
+  if (length(reference_gene_ids_excluded > 0)) {
+    warning(paste0(
+      "The following reference gene IDs are excluded from the preset ",
+      "because they don't have enough data: ",
+      paste(reference_gene_ids_excluded, collapse = ", ")
+    ))
+  }
 
-    reference_gene_ids_included <- reference_gene_ids[
-        reference_gene_ids %chin% gene_ids_filtered
-    ]
+  reference_gene_ids_included <- reference_gene_ids[
+    reference_gene_ids %chin% gene_ids_filtered
+  ]
 
-    if (length(reference_gene_ids_included) < 1) {
-        stop(paste0(
-            "There has to be at least one reference gene for the preset to be ",
-            "valid. Please note that some methods may require more reference ",
-            "genes."
-        ))
-    }
+  if (length(reference_gene_ids_included) < 1) {
+    stop(paste0(
+      "There has to be at least one reference gene for the preset to be ",
+      "valid. Please note that some methods may require more reference ",
+      "genes."
+    ))
+  }
 
-    # The included data gets sorted to be able to produce predictable hashes
-    # for the object later.
-    structure(
-        list(
-            reference_gene_ids = sort(reference_gene_ids_included),
-            methods = methods,
-            species_ids = sort(species_ids),
-            gene_ids = sort(gene_ids_filtered)
-        ),
-        class = "geposan_preset"
-    )
+  # The included data gets sorted to be able to produce predictable hashes
+  # for the object later.
+  structure(
+    list(
+      reference_gene_ids = sort(reference_gene_ids_included),
+      methods = methods,
+      species_ids = sort(species_ids),
+      gene_ids = sort(gene_ids_filtered)
+    ),
+    class = "geposan_preset"
+  )
 }
 
 #' S3 method to print a preset object.
@@ -81,20 +81,20 @@ preset <- function(reference_gene_ids,
 #'
 #' @export
 print.geposan_preset <- function(x, ...) {
-    cat(sprintf(
-        paste0(
-            "geposan preset:",
-            "\n  Reference genes: %i",
-            "\n  Included methods: %s",
-            "\n  Number of species: %i",
-            "\n  Number of genes: %i",
-            "\n"
-        ),
-        length(x$reference_gene_ids),
-        paste(sapply(x$methods, function(m) m$id), collapse = ", "),
-        length(x$species_ids),
-        length(x$gene_ids)
-    ))
+  cat(sprintf(
+    paste0(
+      "geposan preset:",
+      "\n  Reference genes: %i",
+      "\n  Included methods: %s",
+      "\n  Number of species: %i",
+      "\n  Number of genes: %i",
+      "\n"
+    ),
+    length(x$reference_gene_ids),
+    paste(sapply(x$methods, function(m) m$id), collapse = ", "),
+    length(x$species_ids),
+    length(x$gene_ids)
+  ))
 
-    invisible(x)
+  invisible(x)
 }

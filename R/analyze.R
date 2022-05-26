@@ -18,54 +18,54 @@
 #'
 #' @export
 analyze <- function(preset, progress = NULL, include_results = TRUE) {
-    if (!inherits(preset, "geposan_preset")) {
-        stop("Preset is invalid. Use geposan::preset() to create one.")
-    }
+  if (!inherits(preset, "geposan_preset")) {
+    stop("Preset is invalid. Use geposan::preset() to create one.")
+  }
 
-    if (is.null(progress)) {
-        progress_bar <- progress::progress_bar$new()
-        progress_bar$update(0.0)
+  if (is.null(progress)) {
+    progress_bar <- progress::progress_bar$new()
+    progress_bar$update(0.0)
 
-        progress <- function(progress_value) {
-            if (!progress_bar$finished) {
-                progress_bar$update(progress_value)
-                if (progress_value >= 1.0) {
-                    progress_bar$terminate()
-                }
-            }
+    progress <- function(progress_value) {
+      if (!progress_bar$finished) {
+        progress_bar$update(progress_value)
+        if (progress_value >= 1.0) {
+          progress_bar$terminate()
         }
+      }
     }
+  }
 
-    progress_buffer <- 0.0
-    method_count <- length(preset$methods)
+  progress_buffer <- 0.0
+  method_count <- length(preset$methods)
 
-    method_progress <- function(progress_value) {
-        progress(progress_buffer + progress_value / method_count)
-    }
+  method_progress <- function(progress_value) {
+    progress(progress_buffer + progress_value / method_count)
+  }
 
-    scores <- data.table(gene = preset$gene_id)
-    results <- list()
+  scores <- data.table(gene = preset$gene_id)
+  results <- list()
 
-    for (method in preset$methods) {
-        method_results <- method$func(preset, method_progress)
+  for (method in preset$methods) {
+    method_results <- method$func(preset, method_progress)
 
-        scores <- merge(scores, method_results$scores, by = "gene")
-        setnames(scores, "score", method$id)
+    scores <- merge(scores, method_results$scores, by = "gene")
+    setnames(scores, "score", method$id)
 
-        results <- c(results, list(method_results))
+    results <- c(results, list(method_results))
 
-        progress_buffer <- progress_buffer + 1 / method_count
-        progress(progress_buffer)
-    }
+    progress_buffer <- progress_buffer + 1 / method_count
+    progress(progress_buffer)
+  }
 
-    structure(
-        list(
-            preset = preset,
-            scores = scores,
-            results = if (include_results) results else NULL
-        ),
-        class = "geposan_analysis"
-    )
+  structure(
+    list(
+      preset = preset,
+      scores = scores,
+      results = if (include_results) results else NULL
+    ),
+    class = "geposan_analysis"
+  )
 }
 
 #' Print an analysis object.
@@ -77,14 +77,14 @@ analyze <- function(preset, progress = NULL, include_results = TRUE) {
 #'
 #' @export
 print.geposan_analysis <- function(x, ...) {
-    cat("geposan analysis:\n\n")
-    print(x$preset)
+  cat("geposan analysis:\n\n")
+  print(x$preset)
+  cat("\n")
+
+  for (result in x$results) {
+    print(result)
     cat("\n")
+  }
 
-    for (result in x$results) {
-        print(result)
-        cat("\n")
-    }
-
-    invisible(x)
+  invisible(x)
 }

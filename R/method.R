@@ -12,34 +12,34 @@
 #'
 #' @export
 method <- function(id, name, description, func) {
-    stopifnot(is.character(id) & length(id) == 1)
-    stopifnot(is.character(name) & length(name) == 1)
-    stopifnot(is.character(description) & length(description) == 1)
-    stopifnot(is.function(func))
+  stopifnot(is.character(id) & length(id) == 1)
+  stopifnot(is.character(name) & length(name) == 1)
+  stopifnot(is.character(description) & length(description) == 1)
+  stopifnot(is.function(func))
 
-    structure(
-        list(
-            id = id,
-            name = name,
-            description = description,
-            func = func
-        ),
-        class = "geposan_method"
-    )
+  structure(
+    list(
+      id = id,
+      name = name,
+      description = description,
+      func = func
+    ),
+    class = "geposan_method"
+  )
 }
 
 #' Get a list of all available methods.
 #'
 #' @export
 all_methods <- function() {
-    list(
-        clustering(),
-        correlation(),
-        neural(),
-        adjacency(),
-        species_adjacency(),
-        proximity()
-    )
+  list(
+    clustering(),
+    correlation(),
+    neural(),
+    adjacency(),
+    species_adjacency(),
+    proximity()
+  )
 }
 
 #' Print a method object.
@@ -51,18 +51,18 @@ all_methods <- function() {
 #'
 #' @export
 print.geposan_method <- function(x, ...) {
-    cat(sprintf(
-        paste0(
-            "geposan method:",
-            "\n  Method ID: %s",
-            "\n  Name: %s",
-            "\n  Description: %s",
-            "\n"
-        ),
-        x$id,
-        x$name,
-        x$description
-    ))
+  cat(sprintf(
+    paste0(
+      "geposan method:",
+      "\n  Method ID: %s",
+      "\n  Name: %s",
+      "\n  Description: %s",
+      "\n"
+    ),
+    x$id,
+    x$name,
+    x$description
+  ))
 
-    invisible(x)
+  invisible(x)
 }

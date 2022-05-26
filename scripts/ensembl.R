@@ -12,8 +12,8 @@ ensembl_datasets <- data.table(biomaRt::listDatasets(ensembl))
 
 # Filter out species ID and name from the result.
 species <- ensembl_datasets[, .(
-    id = stringr::str_match(dataset, "(.*)_gene_ensembl")[, 2],
-    name = stringr::str_match(description, "(.*) genes \\(.*\\)")[, 2]
+  id = stringr::str_match(dataset, "(.*)_gene_ensembl")[, 2],
+  name = stringr::str_match(description, "(.*) genes \\(.*\\)")[, 2]
 )]
 
 # List of assemblies that the Ensembl Rest API advertises as chromosomes.
@@ -23,232 +23,232 @@ species <- ensembl_datasets[, .(
 #
 # See get_all_chromosomes()
 valid_chromosome_names <- c(
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "11",
-    "12",
-    "13",
-    "14",
-    "15",
-    "16",
-    "17",
-    "18",
-    "19",
-    "20",
-    "X",
-    "Y",
-    "21",
-    "4A",
-    "1A",
-    "22",
-    "23",
-    "24",
-    "25LG1",
-    "25LG2",
-    "26",
-    "27",
-    "28",
-    "LGE22",
-    "Z",
-    "25",
-    "29",
-    "A1",
-    "A2",
-    "A3",
-    "B1",
-    "B2",
-    "B3",
-    "B4",
-    "C1",
-    "C2",
-    "D1",
-    "D2",
-    "D3",
-    "D4",
-    "E1",
-    "E2",
-    "E3",
-    "F1",
-    "F2",
-    "2A",
-    "2B",
-    "LG01",
-    "LG02",
-    "LG03",
-    "LG04",
-    "LG05",
-    "LG06",
-    "LG07",
-    "LG08",
-    "LG09",
-    "LG10",
-    "LG11",
-    "LG12",
-    "LG13",
-    "LG14",
-    "LG15",
-    "LG16",
-    "LG17",
-    "LG18",
-    "LG19",
-    "LG20",
-    "LG21",
-    "LG22",
-    "LG23",
-    "LG24",
-    "LG25",
-    "I",
-    "II",
-    "III",
-    "IV",
-    "V",
-    "VI",
-    "VII",
-    "VIII",
-    "IX",
-    "XI",
-    "XII",
-    "XIII",
-    "XIV",
-    "XV",
-    "XVI",
-    "XVII",
-    "XVIII",
-    "XIX",
-    "XX",
-    "XXI",
-    "XXII",
-    "XXIII",
-    "XXIV",
-    "W",
-    "30",
-    "31",
-    "32",
-    "33",
-    "34",
-    "35",
-    "36",
-    "37",
-    "38",
-    "39",
-    "40",
-    "2L",
-    "2R",
-    "3L",
-    "3R",
-    "LG1",
-    "LG2",
-    "LG3",
-    "LG4",
-    "LG5",
-    "LG6",
-    "LG7",
-    "LG8",
-    "LG9",
-    "LG26",
-    "LG27",
-    "LG28",
-    "LG29",
-    "LG30",
-    "1a",
-    "7b",
-    "22a",
-    "LGE22C19W28_E50C23",
-    "LGE64",
-    "7a",
-    "MIC_1",
-    "MIC_10",
-    "MIC_11",
-    "MIC_2",
-    "MIC_3",
-    "MIC_4",
-    "MIC_5",
-    "MIC_6",
-    "MIC_7",
-    "MIC_8",
-    "MIC_9",
-    "sgr01",
-    "sgr02",
-    "sgr03",
-    "sgr04",
-    "sgr05",
-    "sgr06",
-    "sgr07",
-    "sgr08",
-    "sgr09",
-    "sgr10",
-    "sgr11",
-    "sgr12",
-    "sgr13",
-    "sgr14",
-    "sgr15",
-    "sgr16",
-    "sgr17",
-    "sgr18",
-    "sgr19",
-    "X1",
-    "X2",
-    "X3",
-    "X4",
-    "X5",
-    "a",
-    "b",
-    "c",
-    "d",
-    "f",
-    "g",
-    "h",
-    "41",
-    "42",
-    "43",
-    "44",
-    "45",
-    "46",
-    "47",
-    "48",
-    "49",
-    "50",
-    "LG28B",
-    "LG30F",
-    "LG36F",
-    "LG37M",
-    "LG42F",
-    "LG44F",
-    "LG45M",
-    "LG48F",
-    "LG49B",
-    "LG34",
-    "LG35",
-    "LG7_11",
-    "groupI",
-    "groupII",
-    "groupIII",
-    "groupIV",
-    "groupV",
-    "groupVI",
-    "groupVII",
-    "groupVIII",
-    "groupIX",
-    "groupX",
-    "groupXI",
-    "groupXII",
-    "groupXIII",
-    "groupXIV",
-    "groupXV",
-    "groupXVI",
-    "groupXVII",
-    "groupXVIII",
-    "groupXIX",
-    "groupXX",
-    "groupXXI"
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "X",
+  "Y",
+  "21",
+  "4A",
+  "1A",
+  "22",
+  "23",
+  "24",
+  "25LG1",
+  "25LG2",
+  "26",
+  "27",
+  "28",
+  "LGE22",
+  "Z",
+  "25",
+  "29",
+  "A1",
+  "A2",
+  "A3",
+  "B1",
+  "B2",
+  "B3",
+  "B4",
+  "C1",
+  "C2",
+  "D1",
+  "D2",
+  "D3",
+  "D4",
+  "E1",
+  "E2",
+  "E3",
+  "F1",
+  "F2",
+  "2A",
+  "2B",
+  "LG01",
+  "LG02",
+  "LG03",
+  "LG04",
+  "LG05",
+  "LG06",
+  "LG07",
+  "LG08",
+  "LG09",
+  "LG10",
+  "LG11",
+  "LG12",
+  "LG13",
+  "LG14",
+  "LG15",
+  "LG16",
+  "LG17",
+  "LG18",
+  "LG19",
+  "LG20",
+  "LG21",
+  "LG22",
+  "LG23",
+  "LG24",
+  "LG25",
+  "I",
+  "II",
+  "III",
+  "IV",
+  "V",
+  "VI",
+  "VII",
+  "VIII",
+  "IX",
+  "XI",
+  "XII",
+  "XIII",
+  "XIV",
+  "XV",
+  "XVI",
+  "XVII",
+  "XVIII",
+  "XIX",
+  "XX",
+  "XXI",
+  "XXII",
+  "XXIII",
+  "XXIV",
+  "W",
+  "30",
+  "31",
+  "32",
+  "33",
+  "34",
+  "35",
+  "36",
+  "37",
+  "38",
+  "39",
+  "40",
+  "2L",
+  "2R",
+  "3L",
+  "3R",
+  "LG1",
+  "LG2",
+  "LG3",
+  "LG4",
+  "LG5",
+  "LG6",
+  "LG7",
+  "LG8",
+  "LG9",
+  "LG26",
+  "LG27",
+  "LG28",
+  "LG29",
+  "LG30",
+  "1a",
+  "7b",
+  "22a",
+  "LGE22C19W28_E50C23",
+  "LGE64",
+  "7a",
+  "MIC_1",
+  "MIC_10",
+  "MIC_11",
+  "MIC_2",
+  "MIC_3",
+  "MIC_4",
+  "MIC_5",
+  "MIC_6",
+  "MIC_7",
+  "MIC_8",
+  "MIC_9",
+  "sgr01",
+  "sgr02",
+  "sgr03",
+  "sgr04",
+  "sgr05",
+  "sgr06",
+  "sgr07",
+  "sgr08",
+  "sgr09",
+  "sgr10",
+  "sgr11",
+  "sgr12",
+  "sgr13",
+  "sgr14",
+  "sgr15",
+  "sgr16",
+  "sgr17",
+  "sgr18",
+  "sgr19",
+  "X1",
+  "X2",
+  "X3",
+  "X4",
+  "X5",
+  "a",
+  "b",
+  "c",
+  "d",
+  "f",
+  "g",
+  "h",
+  "41",
+  "42",
+  "43",
+  "44",
+  "45",
+  "46",
+  "47",
+  "48",
+  "49",
+  "50",
+  "LG28B",
+  "LG30F",
+  "LG36F",
+  "LG37M",
+  "LG42F",
+  "LG44F",
+  "LG45M",
+  "LG48F",
+  "LG49B",
+  "LG34",
+  "LG35",
+  "LG7_11",
+  "groupI",
+  "groupII",
+  "groupIII",
+  "groupIV",
+  "groupV",
+  "groupVI",
+  "groupVII",
+  "groupVIII",
+  "groupIX",
+  "groupX",
+  "groupXI",
+  "groupXII",
+  "groupXIII",
+  "groupXIV",
+  "groupXV",
+  "groupXVI",
+  "groupXVII",
+  "groupXVIII",
+  "groupXIX",
+  "groupXX",
+  "groupXXI"
 )
 
 #' Get all chromosome names for an Ensembl dataset.
@@ -256,8 +256,8 @@ valid_chromosome_names <- c(
 #' The function tries to filter out valid chromosome names from the available
 #' assemblies in the dataset.
 get_chromosome_names <- function(dataset) {
-    chromosome_names <- biomaRt::listFilterOptions(dataset, "chromosome_name")
-    chromosome_names[chromosome_names %chin% valid_chromosome_names]
+  chromosome_names <- biomaRt::listFilterOptions(dataset, "chromosome_name")
+  chromosome_names[chromosome_names %chin% valid_chromosome_names]
 }
 
 # Retrieve information on human genes. This will only include genes on
@@ -267,16 +267,16 @@ rlog::log_info("Retrieving information on human genes")
 dataset <- biomaRt::useDataset("hsapiens_gene_ensembl", mart = ensembl)
 
 human_data <- data.table(biomaRt::getBM(
-    attributes = c(
-        "ensembl_gene_id",
-        "hgnc_symbol",
-        "chromosome_name",
-        "start_position",
-        "end_position"
-    ),
-    filters = "chromosome_name",
-    values = get_chromosome_names(dataset),
-    mart = dataset
+  attributes = c(
+    "ensembl_gene_id",
+    "hgnc_symbol",
+    "chromosome_name",
+    "start_position",
+    "end_position"
+  ),
+  filters = "chromosome_name",
+  values = get_chromosome_names(dataset),
+  mart = dataset
 ))
 
 # Remove duplicated gene IDs (at the time of writing, there are a handful).
@@ -284,9 +284,9 @@ human_data <- unique(human_data, by = "ensembl_gene_id")
 
 # Only keep relevant information on genes.
 genes <- human_data[, .(
-    id = ensembl_gene_id,
-    name = hgnc_symbol,
-    chromosome = chromosome_name
+  id = ensembl_gene_id,
+  name = hgnc_symbol,
+  chromosome = chromosome_name
 )]
 
 # Retrieve gene distance data across species.
@@ -296,39 +296,39 @@ distances <- data.table()
 
 #' Handle data for one species.
 handle_species <- function(species_id, species_data) {
-    chromosomes <- species_data[,
-        .(chromosome_length = max(end_position)),
-        by = chromosome_name
-    ]
+  chromosomes <- species_data[,
+    .(chromosome_length = max(end_position)),
+    by = chromosome_name
+  ]
 
-    # Store the number of chromosomes in the species table.
-    species[id == species_id, n_chromosomes := nrow(chromosomes)]
+  # Store the number of chromosomes in the species table.
+  species[id == species_id, n_chromosomes := nrow(chromosomes)]
 
-    # Store the median chromosome length in the species table.
-    species[
-        id == species_id,
-        median_chromosome_length := chromosomes[, median(chromosome_length)]
-    ]
+  # Store the median chromosome length in the species table.
+  species[
+    id == species_id,
+    median_chromosome_length := chromosomes[, median(chromosome_length)]
+  ]
 
-    # Precompute the genes' distance to the nearest telomere.
-    species_distances <- species_data[
-        chromosomes,
-        .(
-            species = species_id,
-            gene = ensembl_gene_id,
-            chromosome_name = chromosome_name,
-            start_position = start_position,
-            end_position = end_position,
-            distance = pmin(
-                start_position,
-                chromosome_length - end_position
-            )
-        ),
-        on = "chromosome_name"
-    ]
+  # Precompute the genes' distance to the nearest telomere.
+  species_distances <- species_data[
+    chromosomes,
+    .(
+      species = species_id,
+      gene = ensembl_gene_id,
+      chromosome_name = chromosome_name,
+      start_position = start_position,
+      end_position = end_position,
+      distance = pmin(
+        start_position,
+        chromosome_length - end_position
+      )
+    ),
+    on = "chromosome_name"
+  ]
 
-    # Add species distances to the distances table.
-    distances <<- rbindlist(list(distances, species_distances))
+  # Add species distances to the distances table.
+  distances <<- rbindlist(list(distances, species_distances))
 }
 
 # Handle the human first, as we already retrieved the data and don't need to
@@ -337,67 +337,67 @@ handle_species("hsapiens", human_data)
 
 # Iterate through all other species and retrieve their distance data.
 for (species_id in species[id != "hsapiens", id]) {
-    rlog::log_info(sprintf("Loading species \"%s\"", species_id))
+  rlog::log_info(sprintf("Loading species \"%s\"", species_id))
 
-    dataset <- biomaRt::useDataset(
-        sprintf("%s_gene_ensembl", species_id),
-        mart = ensembl
-    )
+  dataset <- biomaRt::useDataset(
+    sprintf("%s_gene_ensembl", species_id),
+    mart = ensembl
+  )
 
-    # Besides the attributes that are always present, we need to check for
-    # human orthologs. Some species don't have that information and will be
-    # skipped.
-    if (!"hsapiens_homolog_ensembl_gene" %chin%
-        biomaRt::listAttributes(dataset, what = "name")) {
-        rlog::log_info("No data on human orthologs")
-        species <- species[id != species_id]
+  # Besides the attributes that are always present, we need to check for
+  # human orthologs. Some species don't have that information and will be
+  # skipped.
+  if (!"hsapiens_homolog_ensembl_gene" %chin%
+    biomaRt::listAttributes(dataset, what = "name")) {
+    rlog::log_info("No data on human orthologs")
+    species <- species[id != species_id]
 
-        next
-    }
+    next
+  }
 
-    chromosome_names <- get_chromosome_names(dataset)
+  chromosome_names <- get_chromosome_names(dataset)
 
-    # Skip the species, if there are no assembled chromosomes.
-    if (length(chromosome_names) <= 0) {
-        rlog::log_info("No matching chromosome assemblies")
-        species <- species[id != species_id]
+  # Skip the species, if there are no assembled chromosomes.
+  if (length(chromosome_names) <= 0) {
+    rlog::log_info("No matching chromosome assemblies")
+    species <- species[id != species_id]
 
-        next
-    }
+    next
+  }
 
-    # Retrieve information on all genes of the current species, that have
-    # human orthologs. This is called "homolog" in the Ensembl schema.
-    species_distances <- data.table(biomaRt::getBM(
-        attributes = c(
-            "hsapiens_homolog_ensembl_gene",
-            "chromosome_name",
-            "start_position",
-            "end_position"
-        ),
-        filters = c("with_hsapiens_homolog", "chromosome_name"),
-        values = list(TRUE, chromosome_names),
-        mart = dataset
-    ))
+  # Retrieve information on all genes of the current species, that have
+  # human orthologs. This is called "homolog" in the Ensembl schema.
+  species_distances <- data.table(biomaRt::getBM(
+    attributes = c(
+      "hsapiens_homolog_ensembl_gene",
+      "chromosome_name",
+      "start_position",
+      "end_position"
+    ),
+    filters = c("with_hsapiens_homolog", "chromosome_name"),
+    values = list(TRUE, chromosome_names),
+    mart = dataset
+  ))
 
-    # Only include human genes that we have information on.
-    species_distances <- species_distances[
-        hsapiens_homolog_ensembl_gene %chin% genes$id
-    ]
+  # Only include human genes that we have information on.
+  species_distances <- species_distances[
+    hsapiens_homolog_ensembl_gene %chin% genes$id
+  ]
 
-    # Only include one ortholog per human gene.
-    species_distances <- unique(
-        species_distances,
-        by = "hsapiens_homolog_ensembl_gene"
-    )
+  # Only include one ortholog per human gene.
+  species_distances <- unique(
+    species_distances,
+    by = "hsapiens_homolog_ensembl_gene"
+  )
 
-    # Rename gene ID column to match the human data.
-    setnames(
-        species_distances,
-        "hsapiens_homolog_ensembl_gene",
-        "ensembl_gene_id"
-    )
+  # Rename gene ID column to match the human data.
+  setnames(
+    species_distances,
+    "hsapiens_homolog_ensembl_gene",
+    "ensembl_gene_id"
+  )
 
-    handle_species(species_id, species_distances)
+  handle_species(species_id, species_distances)
 }
 
 # Save data in the appropriate place.

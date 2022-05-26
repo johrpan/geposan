@@ -10,18 +10,18 @@
 #'
 #' @export
 result <- function(method_id, scores, details = list()) {
-    stopifnot(is.data.frame(scores) &
-        c("gene", "score") %chin% colnames(scores))
-    stopifnot(is.list(details))
+  stopifnot(is.data.frame(scores) &
+    c("gene", "score") %chin% colnames(scores))
+  stopifnot(is.list(details))
 
-    structure(
-        list(
-            method_id = method_id,
-            scores = scores,
-            details = details
-        ),
-        class = "geposan_result"
-    )
+  structure(
+    list(
+      method_id = method_id,
+      scores = scores,
+      details = details
+    ),
+    class = "geposan_result"
+  )
 }
 
 #' Print a result object.
@@ -33,18 +33,18 @@ result <- function(method_id, scores, details = list()) {
 #'
 #' @export
 print.geposan_result <- function(x, ...) {
-    cat(sprintf(
-        paste0(
-            "geposan result:",
-            "\n  Method: %s",
-            "\n  Number of genes: %i",
-            "\n  Available details: %s",
-            "\n"
-        ),
-        x$method_id,
-        nrow(x$scores),
-        paste(names(x$details), collapse = ", ")
-    ))
+  cat(sprintf(
+    paste0(
+      "geposan result:",
+      "\n  Method: %s",
+      "\n  Number of genes: %i",
+      "\n  Available details: %s",
+      "\n"
+    ),
+    x$method_id,
+    nrow(x$scores),
+    paste(names(x$details), collapse = ", ")
+  ))
 
-    invisible(x)
+  invisible(x)
 }
