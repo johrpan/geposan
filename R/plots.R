@@ -39,18 +39,18 @@ plot_positions <- function(species_ids, gene_sets) {
 
   plot <- plotly::plot_ly() |>
     plotly::layout(
-      xaxis = list(
+      xaxis = list(title = "Distance to telomeres [Bp]"),
+      yaxis = list(
         title = "Species",
         tickvals = species$id,
         ticktext = species$name
       ),
-      yaxis = list(title = "Distance to telomeres [Bp]"),
       bargap = 0.9
     ) |>
     plotly::add_bars(
       data = species_max_distance,
-      x = ~species,
-      y = ~max_distance,
+      x = ~max_distance,
+      y = ~species,
       name = "All genes",
       marker = list(color = base_color())
     )
@@ -71,8 +71,8 @@ plot_positions <- function(species_ids, gene_sets) {
 
       plot <- plot |> plotly::add_markers(
         data = gene_set_data[gene %chin% gene_set],
-        x = ~species,
-        y = ~distance,
+        x = ~distance,
+        y = ~species,
         name = gene_set_name,
         text = ~ glue::glue(
           "<b>{name}</b><br>",
