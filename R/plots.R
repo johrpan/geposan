@@ -105,7 +105,7 @@ plot_positions <- function(species_ids, gene_sets, reference_gene_ids = NULL) {
         ),
         hoverinfo = "text",
         marker = list(
-          size = 10,
+          size = 5,
           color = gene_set_color(index)
         )
       )
