@@ -19,9 +19,11 @@ gene_set_color <- function(index) {
 #' @param species_ids IDs of species to show in the plot.
 #' @param gene_sets A list of gene sets (containing vectors of gene IDs) that
 #'   will be highlighted in the plot. The names will be used as labels.
+#' @param reference_gene_ids Optionally, a set of reference genes that will be
+#'   used to reorder the species.
 #'
 #' @export
-plot_positions <- function(species_ids, gene_sets) {
+plot_positions <- function(species_ids, gene_sets, reference_gene_ids = NULL) {
   if (!requireNamespace("plotly", quietly = TRUE)) {
     stop("Please install \"plotly\" to use this function.")
   }
@@ -37,11 +39,34 @@ plot_positions <- function(species_ids, gene_sets) {
   # Prefilter species.
   species <- geposan::species[id %chin% species_ids]
 
+  # Sort species if reference genes have been provided.
+  if (!is.null(reference_gene_ids)) {
+    species_median_distance <- data[
+      gene %chin% reference_gene_ids,
+      .(median_distance = as.numeric(stats::median(distance))),
+      by = species
+    ]
+
+    species <- merge(
+      species,
+      species_median_distance,
+      by.x = "id",
+      by.y = "species",
+      all.x = TRUE
+    )
+
+    setorder(species, median_distance)
+  }
+
   plot <- plotly::plot_ly() |>
     plotly::layout(
       xaxis = list(title = "Distance to telomeres [Bp]"),
       yaxis = list(
         title = "Species",
+        type = "category",
+        categoryorder = "array",
+        categoryarray = species$id,
+        tickmode = "array",
         tickvals = species$id,
         ticktext = species$name
       ),
