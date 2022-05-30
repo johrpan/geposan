@@ -7,8 +7,6 @@
 #'   final score will be the mean of the result of applying the different
 #'   models. There should be at least two training sets. The analysis will only
 #'   work, if there is at least one reference gene per training set.
-#' @param gene_requirement Minimum proportion of genes from the preset that a
-#'   species has to have in order to be included in the models.
 #' @param control_ratio The proportion of random control genes that is included
 #'   in the training data sets in addition to the reference genes. This should
 #'   be a numeric value between 0.0 and 1.0.
@@ -16,10 +14,7 @@
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-neural <- function(seed = 180199,
-                       n_models = 5,
-                       gene_requirement = 0.5,
-                       control_ratio = 0.5) {
+neural <- function(seed = 180199, n_models = 5, control_ratio = 0.5) {
   method(
     id = "neural",
     name = "Neural",
@@ -37,7 +32,6 @@ neural <- function(seed = 180199,
           reference_gene_ids,
           seed,
           n_models,
-          gene_requirement,
           control_ratio
         ),
         { # nolint
@@ -57,12 +51,6 @@ neural <- function(seed = 180199,
           distances <- geposan::distances[species %chin% species_ids &
             gene %chin% gene_ids]
 
-          # Only include species that have at least 25% of the included genes.
-          distances[, species_n_genes := .N, by = species]
-          distances <- distances[species_n_genes >=
-            gene_requirement * length(gene_ids)]
-          included_species <- distances[, unique(species)]
-
           # Reshape data to put species into columns.
           data <- dcast(
             distances,
@@ -72,7 +60,7 @@ neural <- function(seed = 180199,
 
           # Replace values that are still missing with mean values for the
           # species in question.
-          data[, (included_species) := lapply(included_species, \(species) {
+          data[, (species_ids) := lapply(species_ids, \(species) {
             species <- get(species)
             species[is.na(species)] <- mean(species, na.rm = TRUE)
             species
@@ -129,7 +117,7 @@ neural <- function(seed = 180199,
           # Step 3: Create, train and apply neural network.
           # -----------------------------------------------
 
-          data_matrix <- prepare_data(data, included_species)
+          data_matrix <- prepare_data(data, species_ids)
           output_vars <- NULL
 
           for (i in seq_along(networks)) {
@@ -138,14 +126,14 @@ neural <- function(seed = 180199,
             # Create a new model for each training session, because
             # the model would keep its state across training
             # sessions otherwise.
-            model <- create_model(length(included_species))
+            model <- create_model(length(species_ids))
 
             # Train the model.
             fit <- train_model(
               model,
               network$training_data,
               network$validation_data,
-              included_species
+              species_ids
             )
 
             # Apply the model.
@@ -180,7 +168,7 @@ neural <- function(seed = 180199,
             details = list(
               seed = seed,
               n_models = n_models,
-              all_results = data[, !..included_species],
+              all_results = data[, !..species_ids],
               networks = networks
             )
           )

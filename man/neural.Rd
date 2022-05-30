@@ -4,12 +4,7 @@
 \alias{neural}
 \title{Find genes by training and applying a neural network.}
 \usage{
-neural(
-  seed = 180199,
-  n_models = 5,
-  gene_requirement = 0.5,
-  control_ratio = 0.5
-)
+neural(seed = 180199, n_models = 5, control_ratio = 0.5)
 }
 \arguments{
 \item{seed}{The seed will be used to make the results reproducible.}
@@ -20,9 +15,6 @@ training data and validated using this set. For non-training genes, the
 final score will be the mean of the result of applying the different
 models. There should be at least two training sets. The analysis will only
 work, if there is at least one reference gene per training set.}
-
-\item{gene_requirement}{Minimum proportion of genes from the preset that a
-species has to have in order to be included in the models.}
 
 \item{control_ratio}{The proportion of random control genes that is included
 in the training data sets in addition to the reference genes. This should

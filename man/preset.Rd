@@ -8,7 +8,9 @@ preset(
   reference_gene_ids,
   methods = all_methods(),
   species_ids = geposan::species$id,
-  gene_ids = geposan::genes$id
+  gene_ids = geposan::genes$id,
+  species_requirement = 0.25,
+  gene_requirement = 0.5
 )
 }
 \arguments{
@@ -19,6 +21,12 @@ preset(
 \item{species_ids}{IDs of species to include.}
 
 \item{gene_ids}{IDs of genes to screen.}
+
+\item{species_requirement}{The proportion of species a gene has to have
+orthologs in in order for the gene to qualify.}
+
+\item{gene_requirement}{The proportion of genes that a species has to have
+in order for the species to be included in the analysis.}
 }
 \value{
 The preset to use with \code{\link[=analyze]{analyze()}}.
@@ -27,9 +35,8 @@ The preset to use with \code{\link[=analyze]{analyze()}}.
 A preset is used to specify which methods and inputs should be used for an
 analysis. Note that the genes to process should normally include the
 reference genes to be able to assess the results later. The genes will be
-filtered based on how many species have data for them. Genes which only have
-orthologs for less than 25\% of the input species will be excluded from the
-preset and the analyis. See the different method functions for the available
-methods: \code{\link[=clustering]{clustering()}}, \code{\link[=correlation]{correlation()}}, \code{\link[=neural]{neural()}}, \code{\link[=adjacency]{adjacency()}} and
-\code{\link[=species_adjacency]{species_adjacency()}}.
+filtered based on how many species have data for them. Afterwards, species
+that still have many missing genes will also be excluded. See the different
+method functions for the available methods: \code{\link[=clustering]{clustering()}}, \code{\link[=correlation]{correlation()}},
+\code{\link[=neural]{neural()}}, \code{\link[=adjacency]{adjacency()}} and \code{\link[=species_adjacency]{species_adjacency()}}.
 }
