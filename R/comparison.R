@@ -11,9 +11,7 @@
 #'     \item{`mean_score`}{The mean score of the genes.}
 #'     \item{`mean_rank`}{The mean rank of the genes.}
 #'     \item{`mean_percentile`}{The mean percentile of the genes.}
-#'     \item{`p_value`}{p-value for the null hypothesis that the comparison
-#'       genes do _not_ rank better than other genes. In other words: A low
-#'       p-value means that the comparison genes rank particularly high.}
+#'     \item{`test_result`}{Results of applying a Wilcoxon rank sum test.}
 #'   }
 #'
 #' @export
@@ -34,11 +32,11 @@ compare <- function(ranking, comparison_gene_ids) {
     percentile = stats::quantile(comparison_ranking[, percentile])
   )
 
-  p_value <- stats::wilcox.test(
+  test <- stats::wilcox.test(
     x = comparison_ranking[, score],
     y = ranking[!gene %chin% comparison_gene_ids, score],
-    alternative = "greater"
-  )$p.value
+    conf.int = TRUE
+  )
 
   structure(
     list(
@@ -46,7 +44,7 @@ compare <- function(ranking, comparison_gene_ids) {
       mean_score = comparison_ranking[, mean(score)],
       mean_rank = comparison_ranking[, mean(rank)],
       mean_percentile = comparison_ranking[, mean(percentile)],
-      p_value = p_value
+      test_result = test
     ),
     class = "geposan_comparison"
   )
@@ -75,17 +73,16 @@ print.geposan_comparison <- function(x, ...) {
 
   print(quantiles_formatted, row.names = FALSE)
 
-  cat(sprintf(
-    paste0(
-      "\n  Mean score: %.3f",
-      "\n  Mean rank: %.1f",
-      "\n  Mean percentile: %.1f%%",
-      "\n  p-value for better scores: %.4f\n"
-    ),
-    x$mean_score,
-    x$mean_rank,
-    x$mean_percentile * 100,
-    x$p_value
+  cat(glue::glue(
+    "\n",
+    "\n Mean score: {num(x$mean_score, 3)}",
+    "\n Mean rank: {num(x$mean_rank, 1)}",
+    "\n Mean percentile: {num(x$mean_percentile * 100, 2)}",
+    "\n",
+    "\n Estimated difference in medians: ",
+    "{num(x$test$conf.int[1], 2)} to {num(x$test$conf.int[2], 2)}",
+    "\n Confidence level: 95%",
+    "\n p-value: {num(x$test$p.value, 4)}"
   ))
 
   invisible(x)

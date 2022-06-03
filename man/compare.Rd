@@ -20,9 +20,7 @@ score, rank and percentile of the comparison genes.
 \item{\code{mean_score}}{The mean score of the genes.}
 \item{\code{mean_rank}}{The mean rank of the genes.}
 \item{\code{mean_percentile}}{The mean percentile of the genes.}
-\item{\code{p_value}}{p-value for the null hypothesis that the comparison
-genes do \emph{not} rank better than other genes. In other words: A low
-p-value means that the comparison genes rank particularly high.}
+\item{\code{test_result}}{Results of applying a Wilcoxon rank sum test.}
 }
 }
 \description{

@@ -29,6 +29,17 @@ cached <- function(name, objects, expr) {
   data
 }
 
+#' Format and round a numeric value.
+#'
+#' @param number The number to use.
+#' @param digits Number of decimal places.
+#'
+#' @return A character value.
+#' @noRd
+num <- function(number, digits) {
+  format(round(number, digits = digits), nsmall = digits)
+}
+
 # This is needed to make data.table's symbols available within the package.
 #' @import data.table
 NULL
