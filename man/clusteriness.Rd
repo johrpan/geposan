@@ -4,7 +4,7 @@
 \alias{clusteriness}
 \title{Perform a cluster analysis.}
 \usage{
-clusteriness(data, span = 1e+05, weight = 0.7)
+clusteriness(data, span = 1e+05, weight = 0.7, n_clusters = NULL)
 }
 \arguments{
 \item{data}{The values that should be scored.}
@@ -15,6 +15,12 @@ clusteriness(data, span = 1e+05, weight = 0.7)
 relation to the previous one. For example, if \code{weight} is 0.7 (the
 default), the first cluster will weigh 1.0, the second 0.7, the third 0.49
 etc.}
+
+\item{n_clusters}{Maximum number of clusters that should be taken into
+account. By default, all clusters will be regarded.}
+}
+\value{
+A score between 0.0 and 1.0 summarizing how much the data clusters.
 }
 \description{
 This function will cluster the data using \code{\link[stats:hclust]{stats::hclust()}} and

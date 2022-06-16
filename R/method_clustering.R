@@ -12,7 +12,13 @@
 #'   relation to the previous one. For example, if `weight` is 0.7 (the
 #'   default), the first cluster will weigh 1.0, the second 0.7, the third 0.49
 #'   etc.
-clusteriness <- function(data, span = 100000, weight = 0.7) {
+#' @param n_clusters Maximum number of clusters that should be taken into
+#'   account. By default, all clusters will be regarded.
+#'
+#' @return A score between 0.0 and 1.0 summarizing how much the data clusters.
+#'
+#' @export
+clusteriness <- function(data, span = 100000, weight = 0.7, n_clusters = NULL) {
   n <- length(data)
 
   # Return a score of 0.0 if there is just one or no value at all.
@@ -31,6 +37,12 @@ clusteriness <- function(data, span = 100000, weight = 0.7) {
   score <- 0.0
 
   for (i in seq_along(cluster_sizes)) {
+    if (!is.null(n_clusters)) {
+      if (i > n_clusters) {
+        break
+      }
+    }
+
     cluster_size <- cluster_sizes[i]
 
     if (cluster_size >= 2) {
