@@ -41,7 +41,7 @@ preset <- function(reference_gene_ids,
   ]
 
   # Count included genes per species.
-  species_n_genes <- geposan::distances[, .(n_genes = .N), by = "species"]
+  species_n_genes <- distances[, .(n_genes = .N), by = "species"]
 
   # Filter out species that have too few of the genes.
   species_ids_filtered <- species_n_genes[
