@@ -68,7 +68,9 @@ clusteriness <- function(data,
 #' Process genes clustering their distance to telomeres.
 #'
 #' The result will be cached and can be reused for different presets, because
-#' it is independent of the reference genes in use.
+#' it is independent of the reference genes in use. Most parameters are exposed
+#' for the [clusteriness()] function. See its documentation for more
+#' information.
 #'
 #' @param id Unique ID for the method and its results.
 #' @param name Human readable name for the method.
@@ -80,8 +82,12 @@ clusteriness <- function(data,
 #'
 #' @export
 clustering <- function(id = "clustering",
-    name = "Clustering",
-                       description = "Clustering of genes") {
+                       name = "Clustering",
+                       description = "Clustering of genes",
+                       span = 100000,
+                       weight = 0.7,
+                       n_clusters = NULL,
+                       relation = NULL) {
   method(
     id = id,
     name = name,
@@ -90,33 +96,44 @@ clustering <- function(id = "clustering",
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids
 
-      cached("clustering", c(species_ids, gene_ids), {
-        scores <- data.table(gene = gene_ids)
+      cached(
+        "clustering",
+        c(species_ids, gene_ids, span, weight, n_clusters, relation),
+        { # nolint
+          scores <- data.table(gene = gene_ids)
 
-        # Prefilter the input data by species.
-        distances <- geposan::distances[species %chin% species_ids]
+          # Prefilter the input data by species.
+          distances <- geposan::distances[species %chin% species_ids]
 
-        genes_done <- 0
-        genes_total <- length(gene_ids)
+          genes_done <- 0
+          genes_total <- length(gene_ids)
 
-        # Perform the cluster analysis for one gene.
-        compute <- function(gene_id) {
-          data <- distances[gene == gene_id, distance]
-          score <- clusteriness(data)
+          # Perform the cluster analysis for one gene.
+          compute <- function(gene_id) {
+            data <- distances[gene == gene_id, distance]
 
-          genes_done <<- genes_done + 1
-          progress(genes_done / genes_total)
+            score <- clusteriness(
+              data,
+              span = span,
+              weight = weight,
+              n_clusters = n_clusters,
+              relation = relation
+            )
 
-          score
+            genes_done <<- genes_done + 1
+            progress(genes_done / genes_total)
+
+            score
+          }
+
+          scores[, score := compute(gene), by = gene]
+
+          result(
+            method = "clustering",
+            scores = scores
+          )
         }
-
-        scores[, score := compute(gene), by = gene]
-
-        result(
-          method = "clustering",
-          scores = scores
-        )
-      })
+      )
     }
   )
 }

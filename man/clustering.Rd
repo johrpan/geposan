@@ -7,7 +7,11 @@
 clustering(
   id = "clustering",
   name = "Clustering",
-  description = "Clustering of genes"
+  description = "Clustering of genes",
+  span = 1e+05,
+  weight = 0.7,
+  n_clusters = NULL,
+  relation = NULL
 )
 }
 \arguments{
@@ -22,7 +26,9 @@ An object of class \code{geposan_method}.
 }
 \description{
 The result will be cached and can be reused for different presets, because
-it is independent of the reference genes in use.
+it is independent of the reference genes in use. Most parameters are exposed
+for the \code{\link[=clusteriness]{clusteriness()}} function. See its documentation for more
+information.
 }
 \seealso{
 \code{\link[=clusteriness]{clusteriness()}}
