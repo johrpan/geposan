@@ -28,6 +28,9 @@ densest <- function(data) {
 #' combined. The resulting value is compared to the reference genes and
 #' determines the gene's score in relation to other genes.
 #'
+#' @param id Unique ID for the method and its results.
+#' @param name Human readable name for the method.
+#' @param description Method description.
 #' @param distance_estimate A function that will be used to summarize the
 #'   distance values for each gene. See [densest()] for the default
 #'   implementation.
@@ -39,11 +42,15 @@ densest <- function(data) {
 #' @seealso [species_adjacency()]
 #'
 #' @export
-adjacency <- function(distance_estimate = densest, summarize = stats::median) {
+adjacency <- function(id = "adjacency",
+                      name = "Adjacency",
+                      description = "Adjacency to reference genes",
+                      distance_estimate = densest,
+                      summarize = stats::median) {
   method(
-    id = "adjacency",
-    name = "Adjacency",
-    description = "Adjacency to reference genes",
+    id = id,
+    name = name,
+    description = description,
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids

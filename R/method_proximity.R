@@ -3,6 +3,9 @@
 #' A score will be given to each gene such that 0.0 corresponds to the maximal
 #' distance across all genes and 1.0 corresponds to a distance of 0.
 #'
+#' @param id Unique ID for the method and its results.
+#' @param name Human readable name for the method.
+#' @param description Method description.
 #' @param summarize A function for combining the different proximities into one
 #'   metric. By default, [stats::median()] is used. Other suggested options
 #'   include [min()] and [mean()].
@@ -10,11 +13,14 @@
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-proximity <- function(summarize = stats::median) {
+proximity <- function(id = "proximity",
+                      name = "Proximity",
+                      description = "Proximity to telomeres",
+                      summarize = stats::median) {
   method(
-    id = "proximity",
-    name = "Proximity",
-    description = "Proximity to telomeres",
+    id = id,
+    name = name,
+    description = description,
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids

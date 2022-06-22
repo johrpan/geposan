@@ -1,5 +1,8 @@
 #' Score genes based on their correlation with the reference genes.
 #'
+#' @param id Unique ID for the method and its results.
+#' @param name Human readable name for the method.
+#' @param description Method description.
 #' @param summarize A function for combining the different correlation
 #'   coefficients into one metric. By default, [stats::median()] is used. Other
 #'   suggested options include [max()] and [mean()].
@@ -7,11 +10,14 @@
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-correlation <- function(summarize = stats::median) {
+correlation <- function(id = "correlation",
+                        name = "Correlation",
+                        description = "Correlation with reference genes",
+                        summarize = stats::median) {
   method(
-    id = "correlation",
-    name = "Correlation",
-    description = "Correlation with reference genes",
+    id = id,
+    name = name,
+    description = description,
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids

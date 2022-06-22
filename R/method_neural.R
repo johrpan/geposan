@@ -1,5 +1,8 @@
 #' Find genes by training and applying a neural network.
 #'
+#' @param id Unique ID for the method and its results.
+#' @param name Human readable name for the method.
+#' @param description Method description.
 #' @param seed The seed will be used to make the results reproducible.
 #' @param n_models This number specifies how many sets of training data should
 #'   be created. For each set, there will be a model trained on the remaining
@@ -14,11 +17,16 @@
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-neural <- function(seed = 180199, n_models = 5, control_ratio = 0.5) {
+neural <- function(id = "neural",
+                   name = "Neural",
+                   description = "Assessment by neural network",
+                   seed = 180199,
+                   n_models = 5,
+                   control_ratio = 0.5) {
   method(
-    id = "neural",
-    name = "Neural",
-    description = "Assessment by neural network",
+    id = id,
+    name = name,
+    description = description,
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids

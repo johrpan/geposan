@@ -4,6 +4,9 @@
 #' to the reference genes within that species. Afterwards, the results are
 #' summarized across species and determine the gene's score.
 #'
+#' @param id Unique ID for the method and its results.
+#' @param name Human readable name for the method.
+#' @param description Method description.
 #' @param distance_estimate Function for combining the distance differences
 #'   within one species.
 #' @param summarize Function for summarizing the distance values across species.
@@ -13,12 +16,15 @@
 #' @seealso [adjacency()]
 #'
 #' @export
-species_adjacency <- function(distance_estimate = stats::median,
+species_adjacency <- function(id = "species_adjacency",
+                              name = "Species adj.",
+                              description = "Species adjacency",
+                              distance_estimate = stats::median,
                               summarize = stats::median) {
   method(
-    id = "species_adjacency",
-    name = "Species adj.",
-    description = "Species adjacency",
+    id = id,
+    name = name,
+    description = description,
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids

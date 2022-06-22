@@ -70,16 +70,22 @@ clusteriness <- function(data,
 #' The result will be cached and can be reused for different presets, because
 #' it is independent of the reference genes in use.
 #'
+#' @param id Unique ID for the method and its results.
+#' @param name Human readable name for the method.
+#' @param description Method description.
+#'
 #' @return An object of class `geposan_method`.
 #'
 #' @seealso [clusteriness()]
 #'
 #' @export
-clustering <- function() {
-  method(
-    id = "clustering",
+clustering <- function(id = "clustering",
     name = "Clustering",
-    description = "Clustering of genes",
+                       description = "Clustering of genes") {
+  method(
+    id = id,
+    name = name,
+    description = description,
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids

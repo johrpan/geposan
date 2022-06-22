@@ -4,9 +4,20 @@
 \alias{proximity}
 \title{Score the distance of genes to the telomeres across species.}
 \usage{
-proximity(summarize = stats::median)
+proximity(
+  id = "proximity",
+  name = "Proximity",
+  description = "Proximity to telomeres",
+  summarize = stats::median
+)
 }
 \arguments{
+\item{id}{Unique ID for the method and its results.}
+
+\item{name}{Human readable name for the method.}
+
+\item{description}{Method description.}
+
 \item{summarize}{A function for combining the different proximities into one
 metric. By default, \code{\link[stats:median]{stats::median()}} is used. Other suggested options
 include \code{\link[=min]{min()}} and \code{\link[=mean]{mean()}}.}

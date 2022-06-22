@@ -4,7 +4,18 @@
 \alias{clustering}
 \title{Process genes clustering their distance to telomeres.}
 \usage{
-clustering()
+clustering(
+  id = "clustering",
+  name = "Clustering",
+  description = "Clustering of genes"
+)
+}
+\arguments{
+\item{id}{Unique ID for the method and its results.}
+
+\item{name}{Human readable name for the method.}
+
+\item{description}{Method description.}
 }
 \value{
 An object of class \code{geposan_method}.

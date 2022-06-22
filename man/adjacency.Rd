@@ -4,9 +4,21 @@
 \alias{adjacency}
 \title{Score genes based on their proximity to the reference genes.}
 \usage{
-adjacency(distance_estimate = densest, summarize = stats::median)
+adjacency(
+  id = "adjacency",
+  name = "Adjacency",
+  description = "Adjacency to reference genes",
+  distance_estimate = densest,
+  summarize = stats::median
+)
 }
 \arguments{
+\item{id}{Unique ID for the method and its results.}
+
+\item{name}{Human readable name for the method.}
+
+\item{description}{Method description.}
+
 \item{distance_estimate}{A function that will be used to summarize the
 distance values for each gene. See \code{\link[=densest]{densest()}} for the default
 implementation.}

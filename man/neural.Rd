@@ -4,9 +4,22 @@
 \alias{neural}
 \title{Find genes by training and applying a neural network.}
 \usage{
-neural(seed = 180199, n_models = 5, control_ratio = 0.5)
+neural(
+  id = "neural",
+  name = "Neural",
+  description = "Assessment by neural network",
+  seed = 180199,
+  n_models = 5,
+  control_ratio = 0.5
+)
 }
 \arguments{
+\item{id}{Unique ID for the method and its results.}
+
+\item{name}{Human readable name for the method.}
+
+\item{description}{Method description.}
+
 \item{seed}{The seed will be used to make the results reproducible.}
 
 \item{n_models}{This number specifies how many sets of training data should
