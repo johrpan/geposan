@@ -4,7 +4,13 @@
 \alias{clusteriness}
 \title{Perform a cluster analysis.}
 \usage{
-clusteriness(data, span = 1e+05, weight = 0.7, n_clusters = NULL)
+clusteriness(
+  data,
+  span = 1e+05,
+  weight = 0.7,
+  n_clusters = NULL,
+  relation = NULL
+)
 }
 \arguments{
 \item{data}{The values that should be scored.}
@@ -18,6 +24,10 @@ etc.}
 
 \item{n_clusters}{Maximum number of clusters that should be taken into
 account. By default, all clusters will be regarded.}
+
+\item{relation}{Number of items that the cluster size should be based on.
+This should always at least the length of the data. By default, the length
+of the data is used.}
 }
 \value{
 A score between 0.0 and 1.0 summarizing how much the data clusters.

@@ -14,16 +14,27 @@
 #'   etc.
 #' @param n_clusters Maximum number of clusters that should be taken into
 #'   account. By default, all clusters will be regarded.
+#' @param relation Number of items that the cluster size should be based on.
+#'   This should always at least the length of the data. By default, the length
+#'   of the data is used.
 #'
 #' @return A score between 0.0 and 1.0 summarizing how much the data clusters.
 #'
 #' @export
-clusteriness <- function(data, span = 100000, weight = 0.7, n_clusters = NULL) {
+clusteriness <- function(data,
+                         span = 100000,
+                         weight = 0.7,
+                         n_clusters = NULL,
+                         relation = NULL) {
   n <- length(data)
 
   # Return a score of 0.0 if there is just one or no value at all.
   if (n < 2) {
     return(0.0)
+  }
+
+  if (is.null(relation)) {
+    relation <- n
   }
 
   # Cluster the data and compute the cluster sizes.
@@ -46,7 +57,7 @@ clusteriness <- function(data, span = 100000, weight = 0.7, n_clusters = NULL) {
     cluster_size <- cluster_sizes[i]
 
     if (cluster_size >= 2) {
-      cluster_score <- cluster_size / n
+      cluster_score <- cluster_size / relation
       score <- score + weight^(i - 1) * cluster_score
     }
   }
