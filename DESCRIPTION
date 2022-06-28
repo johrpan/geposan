@@ -7,6 +7,7 @@ Authors@R:
         "Projahn",
         email = "elias@johrpan.de",
         role = c("aut", "cre"),
+        comment = c(ORCID = "0000-0002-4153-4071")
     )
 Description: Analyze genes based on their position across species. This package
     includes gene data from Ensembl. It provides multiple methods to use that
