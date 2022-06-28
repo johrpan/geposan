@@ -34,6 +34,3 @@ In this case, the distance data that is available for one gene is first
 combined. The resulting value is compared to the reference genes and
 determines the gene's score in relation to other genes.
 }
-\seealso{
-\code{\link[=species_adjacency]{species_adjacency()}}
-}

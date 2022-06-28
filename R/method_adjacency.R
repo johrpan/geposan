@@ -39,8 +39,6 @@ densest <- function(data) {
 #'
 #' @return An object of class `geposan_method`.
 #'
-#' @seealso [species_adjacency()]
-#'
 #' @export
 adjacency <- function(id = "adjacency",
                       name = "Adjacency",
