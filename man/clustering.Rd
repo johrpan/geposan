@@ -9,9 +9,7 @@ clustering(
   name = "Clustering",
   description = "Clustering of genes",
   span = 1e+05,
-  weight = 0.7,
-  n_clusters = NULL,
-  relation = NULL
+  weight = 0.7
 )
 }
 \arguments{

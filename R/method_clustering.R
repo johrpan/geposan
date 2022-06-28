@@ -12,29 +12,16 @@
 #'   relation to the previous one. For example, if `weight` is 0.7 (the
 #'   default), the first cluster will weigh 1.0, the second 0.7, the third 0.49
 #'   etc.
-#' @param n_clusters Maximum number of clusters that should be taken into
-#'   account. By default, all clusters will be regarded.
-#' @param relation Number of items that the cluster size should be based on.
-#'   This should always at least the length of the data. By default, the length
-#'   of the data is used.
 #'
 #' @return A score between 0.0 and 1.0 summarizing how much the data clusters.
 #'
 #' @export
-clusteriness <- function(data,
-                         span = 100000,
-                         weight = 0.7,
-                         n_clusters = NULL,
-                         relation = NULL) {
+clusteriness <- function(data, span = 100000, weight = 0.7) {
   n <- length(data)
 
   # Return a score of 0.0 if there is just one or no value at all.
   if (n < 2) {
     return(0.0)
-  }
-
-  if (is.null(relation)) {
-    relation <- n
   }
 
   # Cluster the data and compute the cluster sizes.
@@ -48,17 +35,11 @@ clusteriness <- function(data,
   score <- 0.0
 
   for (i in seq_along(cluster_sizes)) {
-    if (!is.null(n_clusters)) {
-      if (i > n_clusters) {
-        break
-      }
-    }
-
     cluster_size <- cluster_sizes[i]
 
     if (cluster_size >= 2) {
-      cluster_score <- cluster_size / relation
-      score <- score + weight^(i - 1) * cluster_score
+      cluster_score <- cluster_size / n
+      score <- score + weight^(i - 1) * cluster_score # nolint
     }
   }
 
@@ -85,9 +66,7 @@ clustering <- function(id = "clustering",
                        name = "Clustering",
                        description = "Clustering of genes",
                        span = 100000,
-                       weight = 0.7,
-                       n_clusters = NULL,
-                       relation = NULL) {
+                       weight = 0.7) {
   method(
     id = id,
     name = name,
@@ -98,7 +77,7 @@ clustering <- function(id = "clustering",
 
       cached(
         "clustering",
-        c(species_ids, gene_ids, span, weight, n_clusters, relation),
+        c(species_ids, gene_ids, span, weight),
         { # nolint
           scores <- data.table(gene = gene_ids)
 
@@ -112,13 +91,7 @@ clustering <- function(id = "clustering",
           compute <- function(gene_id) {
             data <- distances[gene == gene_id, distance]
 
-            score <- clusteriness(
-              data,
-              span = span,
-              weight = weight,
-              n_clusters = n_clusters,
-              relation = relation
-            )
+            score <- clusteriness(data, span = span, weight = weight)
 
             genes_done <<- genes_done + 1
             progress(genes_done / genes_total)
