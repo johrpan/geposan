@@ -53,14 +53,16 @@ ranking <- function(analysis, weights) {
 #' @param methods Methods to include in the score.
 #' @param reference_gene_ids IDs of the reference genes.
 #' @param target The optimization target. It may be one of "mean", "median",
-#'   "min" or "max" and results in the respective rank being optimized.
+#'   "min" or "max" and results in the respective rank being optimized. By
+#'   default ("combined"), the number of reference genes beyond the 95th
+#'   percentile as well as the mean percentile itself are optimized.
 #'
 #' @returns Named list pairing method names with their optimal weights. This
 #'   can be used as an argument to [ranking()].
 #'
 #' @export
 optimal_weights <- function(analysis, methods, reference_gene_ids,
-                            target = "mean") {
+                            target = "combined") {
   if (!inherits(analysis, c("geposan_analysis", "geposan_ranking"))) {
     stop("Invalid analyis. Use geposan::analyze().")
   }
@@ -79,8 +81,10 @@ optimal_weights <- function(analysis, methods, reference_gene_ids,
         max(rank)
       } else if (target == "mean") {
         mean(rank)
-      } else {
+      } else if (target == "median") {
         stats::median(rank)
+      } else {
+        sum(percentile < 0.95) * (1 - mean(percentile))
       }
     ]
 

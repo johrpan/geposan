@@ -4,7 +4,7 @@
 \alias{optimal_weights}
 \title{Find the best weights to rank the results.}
 \usage{
-optimal_weights(analysis, methods, reference_gene_ids, target = "mean")
+optimal_weights(analysis, methods, reference_gene_ids, target = "combined")
 }
 \arguments{
 \item{analysis}{Results from \code{\link[=analyze]{analyze()}} or \code{\link[=ranking]{ranking()}}.}
@@ -14,7 +14,9 @@ optimal_weights(analysis, methods, reference_gene_ids, target = "mean")
 \item{reference_gene_ids}{IDs of the reference genes.}
 
 \item{target}{The optimization target. It may be one of "mean", "median",
-"min" or "max" and results in the respective rank being optimized.}
+"min" or "max" and results in the respective rank being optimized. By
+default ("combined"), the number of reference genes beyond the 95th
+percentile as well as the mean percentile itself are optimized.}
 }
 \value{
 Named list pairing method names with their optimal weights. This
