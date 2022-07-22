@@ -212,13 +212,11 @@ plot_rankings <- function(rankings, gene_sets) {
 #' @param ranking The ranking to visualize.
 #' @param gene_sets A named list of gene sets (containing vectors of gene IDs)
 #'   that will be highlighted in the plot. The names will be used in the legend.
-#' @param max_rank The maximum rank of included genes. All genes that are ranked
-#'   lower will appear greyed out.
 #'
 #' @seealso ranking()
 #'
 #' @export
-plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
+plot_scores <- function(ranking, gene_sets = NULL) {
   if (!requireNamespace("plotly", quietly = TRUE)) {
     stop("Please install \"plotly\" to use this function.")
   }
@@ -241,7 +239,21 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
         title = "Percentile",
         tickformat = ".0%"
       ),
-      yaxis = list(title = "Score")
+      yaxis = list(title = "Score"),
+      shapes = list(
+        vline(0.95),
+        vline(0.75),
+        vline(0.50),
+        vline(0.25),
+        vline(0.05)
+      ),
+      annotations = list(
+        vlineannotation(0.95),
+        vlineannotation(0.75),
+        vlineannotation(0.50),
+        vlineannotation(0.25),
+        vlineannotation(0.05)
+      )
     )
 
   if (length(gene_sets) > 0) {
@@ -277,26 +289,6 @@ plot_scores <- function(ranking, gene_sets = NULL, max_rank = NULL) {
       )
 
       index <- index + 1
-    }
-  }
-
-
-  if (!is.null(max_rank)) {
-    first_not_included_rank <- max_rank + 1
-    last_rank <- ranking[, .N]
-
-    if (first_not_included_rank <= last_rank) {
-      plot <- plot |> plotly::layout(
-        shapes = list(
-          type = "rect",
-          fillcolor = "black",
-          opacity = 0.1,
-          x0 = 1 - first_not_included_rank / n_ranks,
-          x1 = 1 - last_rank / n_ranks,
-          y0 = 0.0,
-          y1 = 1.0
-        )
-      )
     }
   }
 
@@ -493,4 +485,40 @@ plot_scores_by_position <- function(ranking,
       }),
       yaxis = list(title = "Score")
     )
+}
+
+#' Helper function for creating a vertical line for plotly.
+#' @noRd
+vline <- function(x) {
+  list(
+    type = "line",
+    y0 = 0,
+    y1 = 1,
+    yref = "paper",
+    x0 = x,
+    x1 = x,
+    line = list(
+      color = "#00000080",
+      opacity = 0.5,
+      dash = "dot"
+    )
+  )
+}
+
+#' Helper function for creating annotations for lines created using [vline()].
+#' @noRd
+vlineannotation <- function(x) {
+  list(
+    text = glue::glue("{round(x * 100)}%"),
+    showarrow = FALSE,
+    yref = "paper",
+    x = x,
+    y = 1,
+    xanchor = "left",
+    xshift = 4,
+    align = "left",
+    font = list(
+      color = "#00000080"
+    )
+  )
 }
