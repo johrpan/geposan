@@ -13,9 +13,9 @@
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-proximity <- function(id = "proximity",
-                      name = "Proximity",
-                      description = "Proximity to telomeres",
+distance <- function(id = "distance",
+                      name = "Distance",
+                      description = "Distance to telomeres",
                       summarize = stats::median) {
   method(
     id = id,
@@ -25,7 +25,7 @@ proximity <- function(id = "proximity",
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids
 
-      cached("proximity", c(species_ids, gene_ids), {
+      cached("distance", c(species_ids, gene_ids), {
         # Prefilter distances by species and gene.
         data <- geposan::distances[
           species %chin% preset$species_ids &
@@ -39,12 +39,12 @@ proximity <- function(id = "proximity",
         ]
 
         # Normalize scores.
-        data[, score := 1 - combined_distance / max(combined_distance)]
+        data[, score := combined_distance / max(combined_distance)]
 
         progress(1.0)
 
         result(
-          method = "proximity",
+          method = "distance",
           scores = data[, .(gene, score)],
           details = list(data = data)
         )

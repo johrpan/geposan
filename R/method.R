@@ -33,11 +33,11 @@ method <- function(id, name, description, func) {
 #' @export
 all_methods <- function() {
   list(
+    distance(),
+    adjacency(),
     clustering(),
     correlation(),
-    neural(),
-    adjacency(),
-    proximity()
+    neural()
   )
 }
 
