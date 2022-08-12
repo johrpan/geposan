@@ -19,7 +19,7 @@ method <- function(id, name, description, func) {
 
   structure(
     list(
-      id = id,
+      id = glue::glue("geposan_method_{id}"),
       name = name,
       description = description,
       func = func

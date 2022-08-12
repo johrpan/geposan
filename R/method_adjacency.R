@@ -55,7 +55,7 @@ adjacency <- function(id = "adjacency",
       reference_gene_ids <- preset$reference_gene_ids
 
       cached(
-        "adjacency",
+        id,
         c(
           species_ids,
           gene_ids,

@@ -33,7 +33,7 @@ neural <- function(id = "neural",
       reference_gene_ids <- preset$reference_gene_ids
 
       cached(
-        "neural",
+        id,
         c(
           species_ids,
           gene_ids,

@@ -76,7 +76,7 @@ clustering <- function(id = "clustering",
       gene_ids <- preset$gene_ids
 
       cached(
-        "clustering",
+        id,
         c(species_ids, gene_ids, span, weight),
         { # nolint
           scores <- data.table(gene = gene_ids)

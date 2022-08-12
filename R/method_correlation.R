@@ -24,7 +24,7 @@ correlation <- function(id = "correlation",
       reference_gene_ids <- preset$reference_gene_ids
 
       cached(
-        "correlation",
+        id,
         c(species_ids, gene_ids, reference_gene_ids, summarize),
         { # nolint
           # Prefilter distances by species.

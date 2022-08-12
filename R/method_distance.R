@@ -14,9 +14,9 @@
 #'
 #' @export
 distance <- function(id = "distance",
-                      name = "Distance",
-                      description = "Distance to telomeres",
-                      summarize = stats::median) {
+                     name = "Distance",
+                     description = "Distance to telomeres",
+                     summarize = stats::median) {
   method(
     id = id,
     name = name,
@@ -25,7 +25,7 @@ distance <- function(id = "distance",
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids
 
-      cached("distance", c(species_ids, gene_ids), {
+      cached(id, c(species_ids, gene_ids), {
         # Prefilter distances by species and gene.
         data <- geposan::distances[
           species %chin% preset$species_ids &
