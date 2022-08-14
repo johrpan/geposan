@@ -16,7 +16,7 @@
 distance <- function(id = "distance",
                      name = "Distance",
                      description = "Distance to telomeres",
-                     summarize = stats::median) {
+                     summarize = densest) {
   method(
     id = id,
     name = name,

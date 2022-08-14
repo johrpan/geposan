@@ -8,7 +8,7 @@ distance(
   id = "distance",
   name = "Distance",
   description = "Distance to telomeres",
-  summarize = stats::median
+  summarize = densest
 )
 }
 \arguments{
