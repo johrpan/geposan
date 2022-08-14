@@ -544,22 +544,6 @@ plot_scores_by_position <- function(ranking,
     by.y = "id"
   )
 
-  data[, `:=`(gene_set = "All genes", color = base_color())]
-
-  index <- 1
-  for (gene_set_name in names(gene_sets)) {
-    gene_set_genes <- gene_sets[[gene_set_name]]
-    data[
-      gene %chin% gene_set_genes,
-      `:=`(
-        gene_set = gene_set_name,
-        color = gene_set_color(index)
-      )
-    ]
-
-    index <- index + 1
-  }
-
   # Use distances instead of positions in case all chromosomes are included.
   if (is.null(chromosome_name)) {
     data[, x := distance]
@@ -567,12 +551,12 @@ plot_scores_by_position <- function(ranking,
     data[, x := start_position]
   }
 
-  plotly::plot_ly() |>
+  fig <- plotly::plot_ly() |>
     plotly::add_markers(
-      data = data,
+      data = data[!gene %chin% unlist(gene_sets)],
       x = ~x,
       y = ~score,
-      name = ~gene_set,
+      name = "All genes",
       text = ~ glue::glue(
         "<b>{name}</b><br>",
         if (is.null(chromosome_name)) "Distance: " else "Position: ",
@@ -581,7 +565,11 @@ plot_scores_by_position <- function(ranking,
         "Rank: {rank}<br>",
         "Percentile: {round(percentile * 100, digits = 2)}%"
       ),
-      hoverinfo = "text",
+       marker = list(
+        color = base_color(),
+        size = 5
+      ),
+      hoverinfo = "text"
     ) |>
     plotly::layout(
       xaxis = list(title = if (is.null(chromosome_name)) {
@@ -591,6 +579,37 @@ plot_scores_by_position <- function(ranking,
       }),
       yaxis = list(title = "Score")
     )
+
+    index <- 1
+
+    for (gene_set_name in names(gene_sets)) {
+      gene_set_genes <- gene_sets[[gene_set_name]]
+
+      fig <- fig |>
+        plotly::add_markers(
+          data = data[gene %chin% gene_set_genes],
+          x = ~x,
+          y = ~score,
+          name = gene_set_name,
+          text = ~ glue::glue(
+            "<b>{name}</b><br>",
+            if (is.null(chromosome_name)) "Distance: " else "Position: ",
+            "{round(x / 1000000, digits = 2)} MBp<br>",
+            "Score: {round(score, digits = 2)}<br>",
+            "Rank: {rank}<br>",
+            "Percentile: {round(percentile * 100, digits = 2)}%"
+          ),
+          marker = list(
+            color = gene_set_color(index),
+            size = 8
+          ),
+          hoverinfo = "text"
+        )
+
+      index <- index + 1
+  }
+
+  fig
 }
 
 #' Helper function for creating a vertical line for plotly.
