@@ -204,6 +204,112 @@ plot_rankings <- function(rankings, gene_sets) {
   plot
 }
 
+#' Plot a scatter plot to compare two rankings.
+#'
+#' This function requires the package `plotly`.
+#'
+#' @param ranking_x The ranking to be shown on the X axis.
+#' @param ranking_y The ranking to be shown on the Y axis.
+#' @param name_x Title of the X axis.
+#' @param name_y Title of the Y axis.
+#' @param gene_sets A named list of vectors of gene IDs to highlight. The names
+#'   will be used to distinguish the sets and in the legend.
+#' @param use_ranks Show ranks instead of scores.
+#'
+#' @export
+plot_rankings_correlation <- function(ranking_x,
+                                      ranking_y,
+                                      name_x,
+                                      name_y,
+                                      gene_sets = NULL,
+                                      use_ranks = TRUE) {
+  if (!requireNamespace("plotly", quietly = TRUE)) {
+    stop("Please install \"plotly\" to use this function.")
+  }
+
+  data <- merge(ranking_x, ranking_y, by = "gene")
+  data <- merge(data, geposan::genes, by.x = "gene", by.y = "id")
+
+  data[, `:=`(
+    x = if (use_ranks) rank.x else score.x,
+    y = if (use_ranks) rank.y else score.y
+  )]
+
+  model <- stats::lm(y ~ x, data)
+  model_data <- data.table(x = seq(min(data$x), max(data$x), length = 100))
+  model_data[, c("y", "lower", "upper") := data.table(
+    stats::predict(model, model_data, interval = "confidence")
+  )]
+
+  # Take a random sample to actually plot.
+  sample_data <- data[!gene %chin% unlist(gene_sets)][sample(.N, 1000)]
+
+  fig <- plotly::plot_ly() |>
+    plotly::add_markers(
+      data = sample_data,
+      x = ~x,
+      y = ~y,
+      name = "All genes",
+      marker = list(
+        color = base_color(),
+        size = 5
+      ),
+      hoverinfo = "skip"
+    ) |>
+    plotly::add_lines(
+      data = model_data,
+      x = ~x,
+      y = ~y,
+      line = list(color = base_color()),
+      showlegend = FALSE,
+      hoverinfo = "skip"
+    ) |>
+    plotly::add_ribbons(
+      data = model_data,
+      x = ~x,
+      ymin = ~lower,
+      ymax = ~upper,
+      fillcolor = base_color_transparent(),
+      line = list(width = 0),
+      showlegend = FALSE,
+      hoverinfo = "skip"
+    )
+
+  gene_set_index <- 1
+  for (gene_set_name in names(gene_sets)) {
+    gene_set <- gene_sets[[gene_set_name]]
+
+    fig <- fig |>
+      plotly::add_markers(
+        data = data[gene %chin% gene_set],
+        x = ~x,
+        y = ~y,
+        name = gene_set_name,
+        text = ~name,
+        marker = list(
+          color = gene_set_color(gene_set_index),
+          size = 8
+        )
+      )
+
+    gene_set_index <- gene_set_index + 1
+  }
+
+  fig <- fig |> plotly::layout(
+    xaxis = list(title = name_x),
+    yaxis = list(title = name_y)
+  )
+
+  if (use_ranks) {
+    fig <- fig |> plotly::layout(
+      xaxis = list(autorange = "reversed"),
+      yaxis = list(autorange = "reversed")
+    )
+  }
+
+  fig
+}
+
 
 #' Plot a ranking as a scatter plot of scores.
 #'
