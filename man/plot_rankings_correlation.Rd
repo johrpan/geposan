@@ -10,7 +10,8 @@ plot_rankings_correlation(
   name_x,
   name_y,
   gene_sets = NULL,
-  use_ranks = TRUE
+  use_ranks = TRUE,
+  use_sample = TRUE
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ plot_rankings_correlation(
 will be used to distinguish the sets and in the legend.}
 
 \item{use_ranks}{Show ranks instead of scores.}
+
+\item{use_sample}{Limit genes outside of the gene sets to a random sample.}
 }
 \description{
 This function requires the package \code{plotly}.

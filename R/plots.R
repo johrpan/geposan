@@ -215,6 +215,7 @@ plot_rankings <- function(rankings, gene_sets) {
 #' @param gene_sets A named list of vectors of gene IDs to highlight. The names
 #'   will be used to distinguish the sets and in the legend.
 #' @param use_ranks Show ranks instead of scores.
+#' @param use_sample Limit genes outside of the gene sets to a random sample.
 #'
 #' @export
 plot_rankings_correlation <- function(ranking_x,
@@ -222,7 +223,8 @@ plot_rankings_correlation <- function(ranking_x,
                                       name_x,
                                       name_y,
                                       gene_sets = NULL,
-                                      use_ranks = TRUE) {
+                                      use_ranks = TRUE,
+                                      use_sample = TRUE) {
   if (!requireNamespace("plotly", quietly = TRUE)) {
     stop("Please install \"plotly\" to use this function.")
   }
@@ -241,12 +243,11 @@ plot_rankings_correlation <- function(ranking_x,
     stats::predict(model, model_data, interval = "confidence")
   )]
 
-  # Take a random sample to actually plot.
-  sample_data <- data[!gene %chin% unlist(gene_sets)][sample(.N, 1000)]
+  fig <- plotly::plot_ly()
 
-  fig <- plotly::plot_ly() |>
-    plotly::add_markers(
-      data = sample_data,
+  if (use_sample) {
+    fig <- fig |> plotly::add_markers(
+      data = data[!gene %chin% unlist(gene_sets)][sample(.N, 1000)],
       x = ~x,
       y = ~y,
       name = "All genes",
@@ -255,7 +256,30 @@ plot_rankings_correlation <- function(ranking_x,
         size = 5
       ),
       hoverinfo = "skip"
-    ) |>
+    )
+  } else {
+    fig <- fig |> plotly::add_markers(
+      data = data,
+      x = ~x,
+      y = ~y,
+      name = "All genes",
+      marker = list(
+        color = base_color(),
+        size = 5
+      ),
+      text = ~ glue::glue(
+        "<b>{name}</b>",
+        "<br>",
+        "{name_x}: {round(x, digits = 2)} ",
+        "({round(percentile.x * 100, digits = 2)}%)<br>",
+        "{name_y}: {round(y, digits = 2)} ",
+        "({round(percentile.y * 100, digits = 2)}%)"
+      ),
+      hoverinfo = "text"
+    )
+  }
+
+  fig <- fig |>
     plotly::add_lines(
       data = model_data,
       x = ~x,
@@ -276,6 +300,7 @@ plot_rankings_correlation <- function(ranking_x,
     )
 
   gene_set_index <- 1
+
   for (gene_set_name in names(gene_sets)) {
     gene_set <- gene_sets[[gene_set_name]]
 
@@ -285,11 +310,19 @@ plot_rankings_correlation <- function(ranking_x,
         x = ~x,
         y = ~y,
         name = gene_set_name,
-        text = ~name,
         marker = list(
           color = gene_set_color(gene_set_index),
           size = 8
-        )
+        ),
+        text = ~ glue::glue(
+          "<b>{name}</b>",
+          "<br>",
+          "{name_x}: {round(x, digits = 2)} ",
+          "({round(percentile.x * 100, digits = 2)}%)<br>",
+          "{name_y}: {round(y, digits = 2)} ",
+          "({round(percentile.y * 100, digits = 2)}%)"
+        ),
+        hoverinfo = "text"
       )
 
     gene_set_index <- gene_set_index + 1
@@ -565,7 +598,7 @@ plot_scores_by_position <- function(ranking,
         "Rank: {rank}<br>",
         "Percentile: {round(percentile * 100, digits = 2)}%"
       ),
-       marker = list(
+      marker = list(
         color = base_color(),
         size = 5
       ),
@@ -580,33 +613,33 @@ plot_scores_by_position <- function(ranking,
       yaxis = list(title = "Score")
     )
 
-    index <- 1
+  index <- 1
 
-    for (gene_set_name in names(gene_sets)) {
-      gene_set_genes <- gene_sets[[gene_set_name]]
+  for (gene_set_name in names(gene_sets)) {
+    gene_set_genes <- gene_sets[[gene_set_name]]
 
-      fig <- fig |>
-        plotly::add_markers(
-          data = data[gene %chin% gene_set_genes],
-          x = ~x,
-          y = ~score,
-          name = gene_set_name,
-          text = ~ glue::glue(
-            "<b>{name}</b><br>",
-            if (is.null(chromosome_name)) "Distance: " else "Position: ",
-            "{round(x / 1000000, digits = 2)} MBp<br>",
-            "Score: {round(score, digits = 2)}<br>",
-            "Rank: {rank}<br>",
-            "Percentile: {round(percentile * 100, digits = 2)}%"
-          ),
-          marker = list(
-            color = gene_set_color(index),
-            size = 8
-          ),
-          hoverinfo = "text"
-        )
+    fig <- fig |>
+      plotly::add_markers(
+        data = data[gene %chin% gene_set_genes],
+        x = ~x,
+        y = ~score,
+        name = gene_set_name,
+        text = ~ glue::glue(
+          "<b>{name}</b><br>",
+          if (is.null(chromosome_name)) "Distance: " else "Position: ",
+          "{round(x / 1000000, digits = 2)} MBp<br>",
+          "Score: {round(score, digits = 2)}<br>",
+          "Rank: {rank}<br>",
+          "Percentile: {round(percentile * 100, digits = 2)}%"
+        ),
+        marker = list(
+          color = gene_set_color(index),
+          size = 8
+        ),
+        hoverinfo = "text"
+      )
 
-      index <- index + 1
+    index <- index + 1
   }
 
   fig
