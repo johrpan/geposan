@@ -9,14 +9,14 @@
 #' @param data The values that should be scored.
 #' @param span The maximum span of values considered to be in one cluster.
 #' @param weight The weight that will be given to the next largest cluster in
-#'   relation to the previous one. For example, if `weight` is 0.7 (the
-#'   default), the first cluster will weigh 1.0, the second 0.7, the third 0.49
+#'   relation to the previous one. For example, if `weight` is 0.5 (the
+#'   default), the first cluster will weigh 1.0, the second 0.5, the third 0.25
 #'   etc.
 #'
 #' @return A score between 0.0 and 1.0 summarizing how much the data clusters.
 #'
 #' @export
-clusteriness <- function(data, span = 100000, weight = 0.7) {
+clusteriness <- function(data, span = 500000, weight = 0.5) {
   n <- length(data)
 
   # Return a score of 0.0 if there is just one or no value at all.
@@ -65,8 +65,8 @@ clusteriness <- function(data, span = 100000, weight = 0.7) {
 clustering <- function(id = "clustering",
                        name = "Clustering",
                        description = "Clustering of genes",
-                       span = 100000,
-                       weight = 0.7) {
+                       span = 500000,
+                       weight = 0.5) {
   method(
     id = id,
     name = name,

@@ -8,8 +8,8 @@ clustering(
   id = "clustering",
   name = "Clustering",
   description = "Clustering of genes",
-  span = 1e+05,
-  weight = 0.7
+  span = 5e+05,
+  weight = 0.5
 )
 }
 \arguments{

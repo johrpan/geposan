@@ -4,7 +4,7 @@
 \alias{clusteriness}
 \title{Perform a cluster analysis.}
 \usage{
-clusteriness(data, span = 1e+05, weight = 0.7)
+clusteriness(data, span = 5e+05, weight = 0.5)
 }
 \arguments{
 \item{data}{The values that should be scored.}
@@ -12,8 +12,8 @@ clusteriness(data, span = 1e+05, weight = 0.7)
 \item{span}{The maximum span of values considered to be in one cluster.}
 
 \item{weight}{The weight that will be given to the next largest cluster in
-relation to the previous one. For example, if \code{weight} is 0.7 (the
-default), the first cluster will weigh 1.0, the second 0.7, the third 0.49
+relation to the previous one. For example, if \code{weight} is 0.5 (the
+default), the first cluster will weigh 1.0, the second 0.5, the third 0.25
 etc.}
 }
 \value{
