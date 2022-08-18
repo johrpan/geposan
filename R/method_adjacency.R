@@ -10,8 +10,6 @@
 #' @param distance_estimate A function that will be used to summarize the
 #'   distance values for each gene. See [densest()] for the default
 #'   implementation.
-#' @param summarize A function that will be used to combine the different
-#'   distances to the reference genes. By default [stats::median()] is used.
 #'
 #' @return An object of class `geposan_method`.
 #'
@@ -19,8 +17,7 @@
 adjacency <- function(id = "adjacency",
                       name = "Adjacency",
                       description = "Adjacency to reference genes",
-                      distance_estimate = densest,
-                      summarize = stats::median) {
+                      distance_estimate = densest) {
   method(
     id = id,
     name = name,
@@ -36,8 +33,7 @@ adjacency <- function(id = "adjacency",
           species_ids,
           gene_ids,
           reference_gene_ids,
-          distance_estimate,
-          summarize
+          distance_estimate
         ),
         { # nolint
           # Filter distances by species and gene and summarize each
@@ -50,14 +46,14 @@ adjacency <- function(id = "adjacency",
 
           # Compute the absolute value of the difference between the
           # estimated distances of each gene to the reference genes.
-          compute_difference <- function(distance_value,
+          compute_difference <- function(distance_values,
                                          comparison_ids) {
-            differences <- data[
+            comparison_distance <- data[
               gene %chin% comparison_ids,
-              .(difference = abs(distance_value - distance))
+              distance_estimate(distance)
             ]
 
-            summarize(differences$difference)
+            abs(distance_values - comparison_distance)
           }
 
           # Compute the differences to the reference genes.
@@ -66,8 +62,7 @@ adjacency <- function(id = "adjacency",
             difference := compute_difference(
               distance,
               reference_gene_ids
-            ),
-            by = gene
+            )
           ]
 
           progress(0.5)
@@ -79,8 +74,7 @@ adjacency <- function(id = "adjacency",
             difference := compute_difference(
               distance,
               reference_gene_ids[reference_gene_ids != gene]
-            ),
-            by = gene
+            )
           ]
 
           # Compute the final score by normalizing the difference.

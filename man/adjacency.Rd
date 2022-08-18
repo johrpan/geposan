@@ -8,8 +8,7 @@ adjacency(
   id = "adjacency",
   name = "Adjacency",
   description = "Adjacency to reference genes",
-  distance_estimate = densest,
-  summarize = stats::median
+  distance_estimate = densest
 )
 }
 \arguments{
@@ -22,9 +21,6 @@ adjacency(
 \item{distance_estimate}{A function that will be used to summarize the
 distance values for each gene. See \code{\link[=densest]{densest()}} for the default
 implementation.}
-
-\item{summarize}{A function that will be used to combine the different
-distances to the reference genes. By default \code{\link[stats:median]{stats::median()}} is used.}
 }
 \value{
 An object of class \code{geposan_method}.
