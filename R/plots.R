@@ -453,15 +453,16 @@ plot_boxplot <- function(ranking, gene_sets = NULL) {
   plot <- plotly::plot_ly() |>
     plotly::add_boxplot(
       data = ranking,
-      x = "All genes",
-      y = ~score,
+      x = ~score,
+      y = "All genes",
       name = "All genes",
       showlegend = FALSE,
+      boxpoints = FALSE,
       line = list(color = base_color())
     ) |>
     plotly::layout(
-      xaxis = list(tickvals = c("All genes", names(gene_sets))),
-      yaxis = list(title = "Score")
+      xaxis = list(title = "Score"),
+      yaxis = list(tickvals = c("All genes", names(gene_sets)))
     )
 
   if (length(gene_sets) > 0) {
@@ -472,10 +473,11 @@ plot_boxplot <- function(ranking, gene_sets = NULL) {
 
       plot <- plot |> plotly::add_boxplot(
         data = ranking[gene %chin% gene_set],
-        x = gene_set_name,
-        y = ~score,
+        x = ~score,
+        y = gene_set_name,
         name = gene_set_name,
         showlegend = FALSE,
+        boxpoints = FALSE,
         line = list(color = gene_set_color(index))
       )
 
