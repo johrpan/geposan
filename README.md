@@ -17,6 +17,12 @@ remotes::install_git("https://code.johrpan.de/johrpan/geposan.git")
 See [this page](https://remotes.r-lib.org/reference/install_git.html) for more
 information on this command.
 
+## Graphical interface
+
+Please also take a look at the interactive graphical web interface for geposan
+which is available as a separate R package called
+[geposanui](https://code.johrpan.de/johrpan/geposanui).
+
 ## License
 
 This program is free software: you can redistribute it and/or modify it under
