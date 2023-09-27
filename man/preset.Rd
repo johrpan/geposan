@@ -38,5 +38,5 @@ reference genes to be able to assess the results later. The genes will be
 filtered based on how many species have data for them. Afterwards, species
 that still have many missing genes will also be excluded. See the different
 method functions for the available methods: \code{\link[=clustering]{clustering()}}, \code{\link[=correlation]{correlation()}},
-\code{\link[=neural]{neural()}}, \code{\link[=adjacency]{adjacency()}} and \code{\link[=species_adjacency]{species_adjacency()}}.
+\code{\link[=distance]{distance()}}, \code{\link[=neural]{neural()}} and \code{\link[=random_forest]{random_forest()}}.
 }

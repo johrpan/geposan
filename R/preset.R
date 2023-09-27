@@ -6,7 +6,7 @@
 #' filtered based on how many species have data for them. Afterwards, species
 #' that still have many missing genes will also be excluded. See the different
 #' method functions for the available methods: [clustering()], [correlation()],
-#' [neural()], [adjacency()] and [species_adjacency()].
+#' [distance()], [neural()] and [random_forest()].
 #'
 #' @param reference_gene_ids IDs of reference genes to compare to.
 #' @param methods List of methods to apply.

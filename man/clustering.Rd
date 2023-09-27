@@ -18,6 +18,10 @@ clustering(
 \item{name}{Human readable name for the method.}
 
 \item{description}{Method description.}
+
+\item{span}{See \code{\link[=clusteriness]{clusteriness()}}.}
+
+\item{weight}{See \code{\link[=clusteriness]{clusteriness()}}.}
 }
 \value{
 An object of class \code{geposan_method}.

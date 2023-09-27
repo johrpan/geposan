@@ -56,6 +56,8 @@ clusteriness <- function(data, span = 500000, weight = 0.5) {
 #' @param id Unique ID for the method and its results.
 #' @param name Human readable name for the method.
 #' @param description Method description.
+#' @param span See [clusteriness()].
+#' @param weight See [clusteriness()].
 #'
 #' @return An object of class `geposan_method`.
 #'
