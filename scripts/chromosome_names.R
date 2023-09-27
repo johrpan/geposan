@@ -19,7 +19,7 @@ get_species_ids <- function() {
 
 #' Get all chromosomes names for a species.
 get_species_chromosomes <- function(species_id) {
-  chromosomes <- unlist(ensembl_request(
+  unlist(ensembl_request(
     paste0("/info/assembly/", species_id)
   )$karyotype)
 }

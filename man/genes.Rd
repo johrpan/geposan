@@ -8,7 +8,7 @@
 A \link{data.table} with the following columns:
 \describe{
 \item{id}{Ensembl gene ID}
-\item{name}{The gene's HGNC name}
+\item{name}{The gene's HGNC name (if available)}
 \item{chrosome}{The human chromosome the gene is located on}
 }
 }
