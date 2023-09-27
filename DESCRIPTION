@@ -25,6 +25,7 @@ Imports:
     data.table,
     glue,
     keras,
+    ranger,
     rlang,
     progress,
     tensorflow
