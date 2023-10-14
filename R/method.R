@@ -37,7 +37,6 @@ all_methods <- function() {
     adjacency(),
     clustering(),
     correlation(),
-    neural(),
     random_forest()
   )
 }

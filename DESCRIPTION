@@ -24,11 +24,9 @@ Depends:
 Imports:
     data.table,
     glue,
-    keras,
     ranger,
     rlang,
-    progress,
-    tensorflow
+    progress
 Suggests:
     biomaRt,
     httr,
