@@ -583,7 +583,7 @@ plot_scores_by_position <- function(ranking,
   if (is.null(chromosome_name)) {
     data[, x := distance]
   } else {
-    data[, x := start_position]
+    data[, x := (start_position + end_position) / 2]
   }
 
   fig <- plotly::plot_ly() |>
