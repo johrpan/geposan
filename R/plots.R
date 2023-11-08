@@ -561,13 +561,14 @@ plot_scores_by_position <- function(ranking,
   }
 
   distance_data <- if (!is.null(chromosome_name)) {
-    chromosome_name_ <- chromosome_name
-    geposan::distances[
-      species == "hsapiens" &
-        chromosome_name == chromosome_name_
+    chromosome_id <- geposan::chromosomes[
+      species == "9606" & name == chromosome_name,
+      id
     ]
+
+    geposan::distances[species == "9606" & chromosome == chromosome_id]
   } else {
-    geposan::distances[species == "hsapiens"]
+    geposan::distances[species == "9606"]
   }
 
   data <- merge(ranking, distance_data, by = "gene")

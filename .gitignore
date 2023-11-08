@@ -1,2 +1,5 @@
 /cache
 .Rproj.user
+/chromosomes.csv
+/genes.csv
+/species.csv

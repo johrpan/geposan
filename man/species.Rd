@@ -7,8 +7,10 @@
 \format{
 A \link{data.table} with the following columns:
 \describe{
-\item{id}{Unique species ID}
+\item{id}{Unique species ID, these are NCBI taxon IDs}
 \item{name}{Human readable species name}
+\item{scientific_name}{Scientific name of the species}
+\item{table_name}{Table name within the Ensembl database}
 \item{n_chromosomes}{Number of chromosomes}
 \item{median_chromosome_length}{Median length of chromosomes}
 }

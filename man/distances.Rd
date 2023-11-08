@@ -9,7 +9,7 @@ A \link{data.table} with the following columns:
 \describe{
 \item{species}{Species ID}
 \item{gene}{Gene ID}
-\item{chromosome_name}{Chromosome name from the specified species}
+\item{chromosome}{Chromosome ID}
 \item{start_position}{Start position in base pairs}
 \item{end_position}{End position in base pairs}
 \item{distance}{Computed distance to nearest telomere}
