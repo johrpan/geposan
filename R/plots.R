@@ -502,42 +502,152 @@ plot_chromosomes <- function(ranking) {
     stop("Please install \"plotly\" to use this function.")
   }
 
-  data <- merge(ranking, geposan::genes, by.x = "gene", by.y = "id")
-  data <- data[, .(score = mean(score)), by = "chromosome"]
-
-  # Get an orderable integer from a chromosome name.
-  chromosome_index <- function(chromosome) {
-    index <- suppressWarnings(as.integer(chromosome))
-
-    ifelse(
-      !is.na(index),
-      index,
-      ifelse(
-        chromosome == "X",
-        998,
-        999
+  data <- merge(
+    geposan::distances[
+      species == "9606",
+      .(
+        gene,
+        chromosome,
+        position = (start_position + end_position) / 2
       )
-    )
+    ],
+    ranking,
+    by = "gene"
+  )[, .(chromosome, position, score)]
+
+  data <- merge(data, geposan::chromosomes, by.x = "chromosome", by.y = "id")
+
+  global_max_position <- data[, max(position)]
+
+  centromeres <- fread("
+    name, start, end
+    1, 122026460, 125184587
+    2, 92188146, 94090557
+    3, 90772459, 93655574
+    4, 49708101, 51743951
+    5, 46485901, 50059807
+    6, 58553889, 59829934
+    7, 58169654, 60828234
+    8, 44033745, 45877265
+    9, 43236168, 45518558
+    10, 39686683, 41593521
+    11, 51078349, 54425074
+    12, 34769408, 37185252
+    13, 16000001, 18051248
+    14, 16000001, 18173523
+    15, 17000001, 19725254
+    16, 36311159, 38280682
+    17, 22813680, 26885980
+    18, 15460900, 20861206
+    19, 24498981, 27190874
+    20, 26436233, 30038348
+    21, 10864561, 12915808
+    22, 12954789, 15054318
+    X, 58605580, 62412542
+    Y, 10316945, 10544039")
+
+  rows_chromosomes <- list(
+    list("1", "2", "3", "4", "5"),
+    list("6", "7", "8", "9", "10", "11", "12"),
+    list("13", "14", "15", "16", "17", "18"),
+    list("19", "20", "21", "22", "X", "Y")
+  )
+
+  cell_width <- floor(100 / max(lengths(rows_chromosomes)))
+  row_height <- floor(100 / length(rows_chromosomes))
+  rows_figs <- list()
+
+  for (chromosomes in rows_chromosomes) {
+    row_figs <- list()
+    n_chromosomes <- length(chromosomes)
+    first <- TRUE
+
+    for (chromosome_name in chromosomes) {
+      chromosome_data <- data[name == chromosome_name]
+
+      # Center chromosomes horizontally
+      offset <- chromosome_data[, (global_max_position - max(position)) / 2]
+      chromosome_data[, position := position + offset]
+
+      model <- stats::loess(
+        score ~ position,
+        chromosome_data
+      )
+
+      positions <- seq(0, global_max_position, by = global_max_position / 100)
+      scores <- stats::predict(model, positions)
+      centromere_position <- offset + centromeres[
+        name == chromosome_name,
+        (start + end) / 2
+      ]
+
+      centromere_score <- scores[!is.na(scores)][
+        which.min(abs(positions[!is.na(scores)] - centromere_position))
+      ]
+
+      row_figs <- c(row_figs, list(htmltools::div(
+        style = glue::glue("width: {cell_width}%; height: {row_height}%"),
+        plotly::plot_ly() |>
+          plotly::add_lines(
+            x = positions,
+            y = scores,
+            line = list(width = 4, color = base_color())
+          ) |>
+          plotly::add_markers(
+            x = centromere_position,
+            y = centromere_score,
+            marker = list(
+              size = 12,
+              color = "white",
+              line = list(width = 4, color = base_color())
+            )
+          ) |>
+          plotly::layout(
+            annotations = list(
+              x = 0.5,
+              y = 0.8,
+              text = chromosome_name,
+              xref = "paper",
+              yref = "paper",
+              xanchor = "center",
+              showarrow = FALSE,
+              font = list(size = 16)
+            ),
+            xaxis = list(
+              range = c(0, global_max_position),
+              showgrid = FALSE,
+              zeroline = FALSE,
+              visible = FALSE
+            ),
+            yaxis = list(
+              range = c(0, 1),
+              showgrid = FALSE,
+              zeroline = FALSE,
+              visible = FALSE
+            ),
+            showlegend = FALSE,
+            margin = list(
+              b = 0,
+              l = 0,
+              r = 0,
+              t = 0
+            )
+          )
+      )))
+
+      first <- FALSE
+    }
+
+    rows_figs <- c(rows_figs, list(htmltools::div(
+      style = "display: flex; justify-content: space-between",
+      row_figs
+    )))
   }
 
-  data[, index := chromosome_index(chromosome)]
-  setorder(data, "index")
-
-  plotly::plot_ly(
-    data = data,
-    x = ~chromosome,
-    y = ~score,
-    type = "bar",
-    marker = list(color = base_color())
-  ) |>
-    plotly::layout(
-      xaxis = list(
-        title = "Chromosome",
-        categoryorder = "array",
-        categoryarray = ~chromosome
-      ),
-      yaxis = list(title = "Mean score")
-    )
+  htmltools::browsable(htmltools::div(
+    style = "display: flex; flex-direction: column",
+    rows_figs
+  ))
 }
 
 #' Plot scores in relation to chromosomal position of genes.
