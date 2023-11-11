@@ -16,7 +16,7 @@
 #' @return A score between 0.0 and 1.0 summarizing how much the data clusters.
 #'
 #' @export
-clusteriness <- function(data, span = 500000, weight = 0.5) {
+clusteriness <- function(data, span = 1000000, weight = 0.5) {
   n <- length(data)
 
   # Return a score of 0.0 if there is just one or no value at all.
@@ -67,7 +67,7 @@ clusteriness <- function(data, span = 500000, weight = 0.5) {
 clustering <- function(id = "clustering",
                        name = "Clustering",
                        description = "Clustering of genes",
-                       span = 500000,
+                       span = 1000000,
                        weight = 0.5) {
   method(
     id = id,

@@ -8,7 +8,7 @@ clustering(
   id = "clustering",
   name = "Clustering",
   description = "Clustering of genes",
-  span = 5e+05,
+  span = 1e+06,
   weight = 0.5
 )
 }

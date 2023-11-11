@@ -4,7 +4,7 @@
 \alias{clusteriness}
 \title{Perform a cluster analysis.}
 \usage{
-clusteriness(data, span = 5e+05, weight = 0.5)
+clusteriness(data, span = 1e+06, weight = 0.5)
 }
 \arguments{
 \item{data}{The values that should be scored.}
