@@ -587,7 +587,10 @@ plot_chromosomes <- function(ranking) {
 
       row_figs <- c(row_figs, list(htmltools::div(
         style = glue::glue("width: {cell_width}%; height: {row_height}%"),
-        plotly::plot_ly() |>
+        plotly::plot_ly(
+          width = 150,
+          height = 150
+        ) |>
           plotly::add_lines(
             x = positions,
             y = scores,
@@ -632,6 +635,9 @@ plot_chromosomes <- function(ranking) {
               r = 0,
               t = 0
             )
+          ) |>
+          plotly::config(
+            staticPlot = TRUE
           )
       )))
 
