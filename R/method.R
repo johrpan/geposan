@@ -3,6 +3,7 @@
 #' @param id Unique identifier for the method.
 #' @param name Human readable name.
 #' @param description Slightly longer description.
+#' @param help Context help for user interfaces.
 #' @param func Function to apply the method. The function should accept two
 #'   parameters: an object of class `geposan_preset` as input and a function to
 #'   report progress information to as a numeric value. The return value should
@@ -11,10 +12,11 @@
 #' @return An object of class `geposan_method`.
 #'
 #' @export
-method <- function(id, name, description, func) {
+method <- function(id, name, description, help, func) {
   stopifnot(is.character(id) & length(id) == 1)
   stopifnot(is.character(name) & length(name) == 1)
   stopifnot(is.character(description) & length(description) == 1)
+  stopifnot(is.character(help) & length(help) == 1)
   stopifnot(is.function(func))
 
   structure(
@@ -22,6 +24,7 @@ method <- function(id, name, description, func) {
       id = glue::glue("geposan_method_{id}"),
       name = name,
       description = description,
+      help = help,
       func = func
     ),
     class = "geposan_method"

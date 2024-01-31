@@ -21,6 +21,7 @@ distance <- function(id = "distance",
     id = id,
     name = name,
     description = description,
+    help = "Median distance to the telomeres across species.",
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids

@@ -18,6 +18,12 @@ correlation <- function(id = "correlation",
     id = id,
     name = name,
     description = description,
+    help = paste0(
+      "Spearman's rank correlation of the telomeric distances of the gene in ",
+      "comparison with the reference gene set. This helps to assess if the ",
+      "gene is as close or distant to telomeres as the reference genes within ",
+      "each species."
+    ),
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids

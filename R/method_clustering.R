@@ -73,6 +73,10 @@ clustering <- function(id = "clustering",
     id = id,
     name = name,
     description = description,
+    help = paste0(
+      "Proportion of orthologs that have similar telomeric distances across ",
+      "species. This favors genes whose position is evolutionarily conserved."
+    ),
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids

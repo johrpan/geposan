@@ -28,6 +28,11 @@ random_forest <- function(id = "rforest",
     id = id,
     name = name,
     description = description,
+    help = paste0(
+      "Assessment of a random forest model trained on reference gene ",
+      "distances. It may derive patterns in positional data that have not ",
+      "been covered by other methods."
+    ),
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids

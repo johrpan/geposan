@@ -4,7 +4,7 @@
 \alias{method}
 \title{Describe a new method for analyzing gene position data.}
 \usage{
-method(id, name, description, func)
+method(id, name, description, help, func)
 }
 \arguments{
 \item{id}{Unique identifier for the method.}
@@ -12,6 +12,8 @@ method(id, name, description, func)
 \item{name}{Human readable name.}
 
 \item{description}{Slightly longer description.}
+
+\item{help}{Context help for user interfaces.}
 
 \item{func}{Function to apply the method. The function should accept two
 parameters: an object of class \code{geposan_preset} as input and a function to

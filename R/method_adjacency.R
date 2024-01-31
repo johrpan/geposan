@@ -22,6 +22,11 @@ adjacency <- function(id = "adjacency",
     id = id,
     name = name,
     description = description,
+    help = paste0(
+      "Adjacency to the reference genes across species. This method penalizes ",
+      "genes that do not occur in the region typical for the reference genes, ",
+      "without artificially defining a fixed boundary."
+    ),
     function(preset, progress) {
       species_ids <- preset$species_ids
       gene_ids <- preset$gene_ids
