@@ -26,6 +26,33 @@ preset <- function(reference_gene_ids,
                    gene_ids = geposan::genes$id,
                    species_requirement = 0.25,
                    gene_requirement = 0.5) {
+  if (is.null(reference_gene_ids) || length(reference_gene_ids) < 1) {
+    stop(paste0(
+      "There has to be at least one reference gene for the preset to be ",
+      "valid. Please note that some methods may require more reference ",
+      "genes. It is best to select as many reference genes as possible."
+    ))
+  }
+
+  if (is.null(methods) || length(methods) < 1) {
+    stop("Please select at least one method")
+  }
+
+  if (is.null(species_ids) || length(species_ids) < 1) {
+    stop(paste0(
+      "Please include at least one species. Please note that it is advisable ",
+      "to include more species (at least ten) in order to get enough data ",
+      "points per gene."
+    ))
+  }
+
+  if (is.null(gene_ids) || length(gene_ids) < 1) {
+    stop(paste0(
+      "Please include at least one gene. Please note, that it is recommended ",
+      "to include all genes in the analysis (the default)."
+    ))
+  }
+
   # Prefilter distances.
   distances <- geposan::distances[
     species %chin% species_ids & gene %chin% gene_ids
@@ -48,6 +75,29 @@ preset <- function(reference_gene_ids,
     n_genes >= gene_requirement * length(gene_ids_filtered),
     species
   ]
+
+  n_species_excluded <- length(species_ids) - length(species_ids_filtered)
+  if (length(species_ids_filtered) < 10 && n_species_excluded >= 1) {
+    warning(glue::glue(
+      "Please note that {n_species_excluded} species have been excluded ",
+      "because they do not share enough orthologs."
+    ))
+  }
+
+  # Check number of data points per gene again:
+
+  genes_n_species <- distances[
+    species %chin% species_ids_filtered & gene %chin% gene_ids_filtered,
+    .(n_species = .N),
+    by = "gene"
+  ]
+
+  if (genes_n_species[, min(n_species)] < 2) {
+    warning(paste0(
+      "The preset contains genes with data for less than two species. Please ",
+      "select more species to get valid results."
+    ))
+  }
 
   reference_gene_ids_excluded <- reference_gene_ids[
     !reference_gene_ids %chin% gene_ids_filtered
