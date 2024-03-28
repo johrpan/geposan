@@ -1,6 +1,6 @@
 Package: geposan
 Title: Gene Position Analysis
-Version: 0.0.0.9000
+Version: 1.0.0
 Authors@R:
     person(
         "Elias",
@@ -18,7 +18,7 @@ Encoding: UTF-8
 LazyData: true
 LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Depends:
     R (>= 4.1)
 Imports:

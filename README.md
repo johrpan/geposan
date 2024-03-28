@@ -1,6 +1,6 @@
 # geposan
 
-Geposan is a R package for analyzing genes based on their position across
+Geposan is an R package for analyzing genes based on their position across
 species. The package includes gene data from Ensembl. It provides multiple
 methods to use that data to find genes that score well in comparison with a
 set of reference genes.
@@ -11,7 +11,7 @@ You can install the development version of geposan using:
 
 ```r
 # install.packages("remotes")
-remotes::install_git("https://code.johrpan.de/johrpan/geposan.git")
+remotes::install_github("johrpan/geposan")
 ```
 
 See [this page](https://remotes.r-lib.org/reference/install_git.html) for more
@@ -21,7 +21,7 @@ information on this command.
 
 Please also take a look at the interactive graphical web interface for geposan
 which is available as a separate R package called
-[geposanui](https://code.johrpan.de/johrpan/geposanui).
+[geposanui](https://github.com/johrpan/geposanui).
 
 ## License
 
