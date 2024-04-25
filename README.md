@@ -17,6 +17,17 @@ remotes::install_github("johrpan/geposan")
 See [this page](https://remotes.r-lib.org/reference/install_git.html) for more
 information on this command.
 
+## Publication
+
+This method and its implementation have been peer-reviewed and published in
+NAR Genomics and Bioinformatics. If you use the package in your research or
+would like to refer to our methodology, please cite the following paper:
+
+Elias F Projahn, Georg Fuellen, Michael Walter, Steffen Möller, Proposing
+candidate genes under telomeric control based on cross-species position data,
+NAR Genomics and Bioinformatics, Volume 6, Issue 2, June 2024, lqae037,
+https://doi.org/10.1093/nargab/lqae037
+
 ## Graphical interface
 
 Please also take a look at the interactive graphical web interface for geposan
