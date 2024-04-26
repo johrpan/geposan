@@ -28,9 +28,7 @@ Imports:
     rlang,
     progress
 Suggests:
-    biomaRt,
-    httr,
     plotly,
     rlog,
-    stringr,
+    RMariaDB,
     usethis
