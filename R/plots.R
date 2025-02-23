@@ -718,8 +718,9 @@ plot_scores_by_position <- function(ranking,
         "Percentile: {round(percentile * 100, digits = 2)}%"
       ),
       marker = list(
-        color = base_color(),
-        size = 5
+        size = 3,
+        color = "#919191",
+        opacity = 0.5
       ),
       hoverinfo = "text"
     ) |>
